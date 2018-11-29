@@ -3,13 +3,13 @@
 clear all;
 
 %MANTENHA ISSO ATUALIZADO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-NRX = 3; %número de dispositivos transmissores
-TOTAL_TIME = 6000;%segundos de simulação (em tempo virtual)
+NRX = 3; %nÃºmero de dispositivos receptores
+TOTAL_TIME = 6000;%segundos de simulaÃ§Ã£o (em tempo virtual)
 
 %ASPECTOS GERAIS (DUMMIE)-------------------------------------------------------
 W = 1e6;
-R = 0.5*ones(1+NRX,1);%resistência dos RLCs
-C = -1*ones(1+NRX,1);%capacitância dos RLCs (usar a do arquivo .mat)
+R = 0.5*ones(1+NRX,1);%resistï¿½ncia dos RLCs
+C = -1*ones(1+NRX,1);%capacitï¿½ncia dos RLCs (usar a do arquivo .mat)
 MAX_ACT_POWER = 200;%W
 MAX_APP_POWER = 200;%W
 
@@ -34,7 +34,7 @@ power_sd = 0;
 minV = 2.3;     % (V)
 minVTO = 3.3;   % (V)
 err = 0.05;     % (5%)
-efficiency = 0.95; % (95% de eficiência de conversão AC/DC)
+efficiency = 0.95; % (95% de eficiï¿½ncia de conversï¿½o AC/DC)
 %--------------------------------------------------------------------------------
 
 STEP=0.2;     % (s)

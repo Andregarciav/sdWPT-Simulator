@@ -41,7 +41,7 @@ function r = rightDelivered(message,messageLists,WPTManager,...
                 end
             end
         end
-        switch(message.options.type)
+        switch(message.options.type) %definir forma de comunicação para cada canal.
             case 0 %SWIPT
                 SINR = SINR_SWIPT(WPTManager,message,...
                     conflictList,N_SWIPT,t);
