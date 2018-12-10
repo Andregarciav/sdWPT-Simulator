@@ -62,6 +62,18 @@ group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
 group.R = -1;group.C = -1;
 group_list = [group_list;group];
 
+% criando posições aleatórias
+
+for i = 1:17
+    x = (-1)^(randi([1,2]))*rand*2;
+    y = (-1)^(randi([1,2]))*rand*5;
+    z = (-1)^(randi([1,2]))*rand*3;
+    group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
+        wire_radius,pts,mi),x,y,z);
+    group.R = -1;group.C = -1;
+    group_list = [group_list;group];
+end
+
 %FIM DA SUA ÁREA DE ATUAÇÃO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 %w = 1e+5 é apenas um valor default. A frequência é de fato definida a posteriori   

@@ -3,7 +3,7 @@
 clear all;
 
 %MANTENHA ISSO ATUALIZADO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-NRX = 3; %número de dispositivos receptores
+NRX = 20; %número de dispositivos receptores
 TOTAL_TIME = 6000;%segundos de simulação (em tempo virtual)
 
 %ASPECTOS GERAIS (DUMMIE)-------------------------------------------------------
