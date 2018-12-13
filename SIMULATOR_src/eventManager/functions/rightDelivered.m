@@ -42,9 +42,9 @@ function r = rightDelivered(message,messageLists,WPTManager,...
             end
         end
         switch(message.options.type)
-            case 0 %SWIPT
-                SINR = SINR_SWIPT(WPTManager,message,...
-                    conflictList,N_SWIPT,t);
+            case 0 %vlc
+                SINR = SINR_VLC(WPTManager,message,...
+                    conflictList,t);
                 if(SINR<B_SWIPT)
                     r = false;
                     out = true;

@@ -3,7 +3,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
     end
     methods
         function obj = powerRXApplication_dummieCoils(id)
-            obj@powerRXApplication(id);%construindo a estrutura referente à superclasse
+            obj@powerRXApplication(id);%construindo a estrutura referente ï¿½superclasse
             obj.APPLICATION_LOG.DATA = 'Exemplo de log';
         end
 
@@ -21,8 +21,8 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
         function [obj,netManager,WPTManager] = handleTimer(obj,GlobalTime,netManager,WPTManager)
             payload = obj.ID;
             payloadLen = 32;%bits
-            %canal 1 de RF, 1000bps, 5W
-            obj = setSendOptions(obj,1,1000,5);
+            %canal 0 de (vlc sobre) swipt, 1000bps, 5W
+            obj = setSendOptions(obj,0,1000,5);
             netManager = broadcast(obj,netManager,payload,payloadLen,GlobalTime);%faz um broadcast com seu id (0, 32 bits)
         end
 

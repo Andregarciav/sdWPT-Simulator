@@ -13,10 +13,10 @@ mi = pi*4e-7; %(dummie)
 %Criação de bobinas dummie
 
 R = 0.01;%raio
-N = 4;%número de espiras
+N = 2;%número de espiras
 pitch= 0.001;%espaçamento entre as espiras
 wire_radius = 0.0004;%espessura do fio (raio)
-pts = 1000; %resolução do caminho
+pts = 2; %resolução do caminho
 
 
 %-------------------------------------------------------------------------------------------------------------------
@@ -41,6 +41,7 @@ y = 0.25;
 z = 0;
 group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
     wire_radius,pts,mi),x,y,z);
+group.coils.obj = rotateCoilX(rotateCoilY(group.coils.obj,pi/2),pi/2); % rotacionar as instâncias vlc
 group.R = -1;group.C = -1;
 group_list = [group_list;group];
 
@@ -62,6 +63,15 @@ group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
 group.R = -1;group.C = -1;
 group_list = [group_list;group];
 
+for i = 1:17
+    x = (-1)^randi(1:2) * rand * 3;
+    y = (-1)^randi(1:2) * rand * 2;
+    z = (-1)^randi(1:2) * rand * 3;
+    group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
+    wire_radius,pts,mi),x,y,z);
+    group.R = -1;group.C = -1;
+    group_list = [group_list;group];
+end
 %FIM DA SUA ÁREA DE ATUAÇÃO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 %w = 1e+5 é apenas um valor default. A frequência é de fato definida a posteriori   

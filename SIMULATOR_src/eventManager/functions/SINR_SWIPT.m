@@ -63,7 +63,9 @@ function SINR = SINR_SWIPT(WPTManager,message,conflictList,N_SWIPT,t)
         I = calculatePower(curr,Z,gI,gR);
         
         SINR = P/(I+N_SWIPT);
+
     else
         SINR = 0;
     end
+    
 end

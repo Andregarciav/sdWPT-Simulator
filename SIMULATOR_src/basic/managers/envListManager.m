@@ -154,6 +154,22 @@ classdef envListManager
             P = lambda*P0 + (1-lambda)*P1;
         end
 
+        %generates a matrix in which each line is the ordered triple of the center of each coil.
+        function P = getOrientations(obj,time)
+            [i0,i1,lambda] = getIndexFromTime(obj,time);
+            P0 = zeros(length(obj.envList(i0).Coils),3);
+            P1 = zeros(length(obj.envList(i1).Coils),3);
+            for j = 1:length(obj.envList(i0).Coils)
+                P0(j,:) = [obj.envList(i0).Coils(j).obj.x(2)-obj.envList(i0).Coils(j).obj.x(1),...
+                    obj.envList(i0).Coils(j).obj.y(2)-obj.envList(i0).Coils(j).obj.y(1),...
+                    obj.envList(i0).Coils(j).obj.z(2)-obj.envList(i0).Coils(j).obj.z(1)];
+                P1(j,:) = [obj.envList(i1).Coils(j).obj.x(2)-obj.envList(i1).Coils(j).obj.x(1),...
+                    obj.envList(i1).Coils(j).obj.y(2)-obj.envList(i1).Coils(j).obj.y(1),...
+                    obj.envList(i1).Coils(j).obj.z(2)-obj.envList(i1).Coils(j).obj.z(1)];
+            end
+            P = lambda*P0 + (1-lambda)*P1;
+        end
+
         %RL_group: resist�ncia equivalente do dispositivo atrelado a cada grupo receptor.
         function [obj,I,TRANSMITTER_DATA] = getCurrent(obj,RL_group,...
             TRANSMITTER_DATA,time)
