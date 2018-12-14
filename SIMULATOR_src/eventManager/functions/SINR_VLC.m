@@ -21,12 +21,12 @@ function SINR = SINR_RF(WPTManager,message,conflictList,t)
 
     H_0 = R_fi * (A/d^2) * Receive_Angle;
 
-    prob = [88.53 80 60 40 20 0]/100;
-    dista = [0 10 354 425 462 500];
+    prob = [88.53 80 60 40 20 0]/100; % Probabilidade do pacote ser entregue
+    dista = [0 10 354 425 462 500]; % Distância de  transmissão em cm
 
     p = interp1 (dista, prob, d);
 
-    if (rand < p) && (Receive_Angle < 0.5)
+    if (rand < p) && (Receive_Angle < 0.5) && (Receive_Angle > -0.5)
         SINR = 1;
     else
         SINR = 0;

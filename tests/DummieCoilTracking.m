@@ -64,9 +64,9 @@ group.R = -1;group.C = -1;
 group_list = [group_list;group];
 
 for i = 1:17
-    x = (-1)^randi(1:2) * rand * 3;
-    y = (-1)^randi(1:2) * rand * 2;
-    z = (-1)^randi(1:2) * rand * 3;
+    x = (-1)^randi(1:2) * rand * 1;
+    y = (-1)^randi(1:2) * rand * 1;
+    z = (-1)^randi(1:2) * rand * 1;
     group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
     wire_radius,pts,mi),x,y,z);
     group.R = -1;group.C = -1;
