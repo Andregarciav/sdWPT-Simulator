@@ -3,10 +3,12 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
         interval
         One_hope = [];
         two_hope = [];
+        g = graph
     end
     methods
         function obj = powerRXApplication_dummieCoils(id)
             obj@powerRXApplication(id);%construindo a estrutura referente �superclasse
+            obj.g = addnode(obj.g,20);
         end
 
         function [obj,netManager,WPTManager] = init(obj,netManager,WPTManager)
@@ -22,6 +24,11 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             if (length(data) == 1)
                 if isempty(obj.One_hope(obj.One_hope==src))
                     obj.One_hope = [obj.One_hope src];
+                   % if(isempty())
+                    for r=1:length(obj.One_hope)
+                        obj.g = addedge(obj.g, obj.ID, obj.One_hope(r));
+                    end
+                    
                     obj.APPLICATION_LOG.DATA = ['One Hope list = ', string(obj.One_hope),...
                                                 'Two Hope list = ', string(obj.two_hope)];%'Exemplo de log';
                 end
@@ -34,6 +41,12 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                         obj.two_hope = [obj.two_hope temp];
                     end
                 end
+                for r=1:length(obj.two_hope)
+                   obj.g = addedge(obj.g, str2num(src), obj.two_hope(r));
+                end
+                %figure(obj.ID);
+                %    plot (obj.g);
+                
             end
         end
 
@@ -44,10 +57,9 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             obj = setSendOptions(obj,0,1000,5);
             netManager = broadcast(obj,netManager,payload,payloadLen,GlobalTime);%faz um broadcast com seu id (0, 32 bits)
             %disp(['I have ID = ',num2str(obj.ID),' and I send a broadcast']);
-            netManager = setTimer(obj,netManager,GlobalTime,obj.interval);
-            disp(['Simulation progress: ',num2str((GlobalTime*100)/(3600*6000)),'% of virtual time)']);
+            %netManager = setTimer(obj,netManager,GlobalTime,obj.interval);
+            disp(['(Simulation progress: ',num2str((GlobalTime*100)/(6000)),'% of virtual time)']);
 				disp(['Expected finishing time: ',num2str(6000/(3600)),'h']);
         end
-
     end
 end

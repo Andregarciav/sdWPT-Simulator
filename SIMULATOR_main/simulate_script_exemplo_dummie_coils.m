@@ -4,7 +4,7 @@ clear all;
 
 %MANTENHA ISSO ATUALIZADO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 NRX = 20; %n�mero de dispositivos transmissores
-TOTAL_TIME = 200;%segundos de simula��o (em tempo virtual)
+TOTAL_TIME = 6000;%segundos de simula��o (em tempo virtual)
 
 %ASPECTOS GERAIS (DUMMIE)-------------------------------------------------------
 W = 1e6;
@@ -78,4 +78,6 @@ for i=2:length(LOG_app_list)
     disp(['For RX ',num2str(i-1),':']);
     disp('--------------------------------------');
     disp(LOG_app_list(i).DATA);
+    figure(i - 1)
+        plot(LOG_app_list(i).g)
 end
