@@ -24,9 +24,11 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             if (length(data) == 1)
                 if isempty(obj.One_hope(obj.One_hope==src))
                     obj.One_hope = [obj.One_hope src];
-                   % if(isempty())
+                    v = neighbors(obj.g, obj.ID);
                     for r=1:length(obj.One_hope)
-                        obj.g = addedge(obj.g, obj.ID, obj.One_hope(r));
+                        if(isempty(v(v==obj.One_hope(r))))
+                            obj.g = addedge(obj.g, obj.ID, obj.One_hope(r));
+                        end
                     end
                     
                     obj.APPLICATION_LOG.DATA = ['One Hope list = ', string(obj.One_hope),...
@@ -41,11 +43,14 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                         obj.two_hope = [obj.two_hope temp];
                     end
                 end
+                v = neighbors(obj.g, str2num(src));
                 for r=1:length(obj.two_hope)
-                   obj.g = addedge(obj.g, str2num(src), obj.two_hope(r));
+                    if(isempty(v(v==obj.two_hope(r))))    
+                        obj.g = addedge(obj.g, str2num(src), obj.two_hope(r));
+                    end
                 end
-                %figure(obj.ID);
-                %    plot (obj.g);
+                figure(obj.ID);
+                    plot (obj.g);
                 
             end
         end
@@ -57,7 +62,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             obj = setSendOptions(obj,0,1000,5);
             netManager = broadcast(obj,netManager,payload,payloadLen,GlobalTime);%faz um broadcast com seu id (0, 32 bits)
             %disp(['I have ID = ',num2str(obj.ID),' and I send a broadcast']);
-            %netManager = setTimer(obj,netManager,GlobalTime,obj.interval);
+            netManager = setTimer(obj,netManager,GlobalTime,obj.interval);
             disp(['(Simulation progress: ',num2str((GlobalTime*100)/(6000)),'% of virtual time)']);
 				disp(['Expected finishing time: ',num2str(6000/(3600)),'h']);
         end
