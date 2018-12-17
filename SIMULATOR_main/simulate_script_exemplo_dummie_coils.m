@@ -3,8 +3,8 @@
 clear all;
 
 %MANTENHA ISSO ATUALIZADO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-NRX = 20; %n�mero de dispositivos transmissores
-TOTAL_TIME = 6000;%segundos de simula��o (em tempo virtual)
+NRX = 7; %n�mero de dispositivos transmissores
+TOTAL_TIME = 10;%segundos de simula��o (em tempo virtual)
 
 %ASPECTOS GERAIS (DUMMIE)-------------------------------------------------------
 W = 1e6;
