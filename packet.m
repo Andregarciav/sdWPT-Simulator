@@ -73,3 +73,16 @@ else
         plot (obj.g);
     
 end
+
+
+
+
+function mudaPesoAdj(graph,quant)
+    for r = 1:(length(b(1,:)))
+        for i = 1:(length(b(:,1)))
+            if b(r,i) ~= 0
+                b(r,i) = b(r,i) + quant;
+            end
+        end
+    end
+end
