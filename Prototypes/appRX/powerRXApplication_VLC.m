@@ -1,4 +1,5 @@
-classdef powerRXApplication_dummieCoils < powerRXApplication
+classdef powerRXApplication_VLC < powerRXApplication
+
     properties
         interval = 2;
         One_hope = [];
@@ -16,9 +17,9 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
         end
 
         function [obj,netManager,WPTManager] = init(obj,netManager,WPTManager)
-        	GlobalTime = 0;
-        	intervalo = rand;%20+rand*80;%random interval between 20s and 100s
-        	netManager = setTimer(obj,netManager,GlobalTime,intervalo);
+            GlobalTime = 0;
+            intervalo = rand;%20+rand*80;%random interval between 20s and 100s
+            netManager = setTimer(obj,netManager,GlobalTime,intervalo);
         end
 
         function [obj,netManager,WPTManager] = handleMessage(obj,data,GlobalTime,netManager,WPTManager)
@@ -58,15 +59,15 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                     obj.One_hope = [obj.One_hope src];
                 end
                 
-                 %%%%%%%%%%%%%%%%%%%%%% ADD NODES AND EDGES IN GRAPH %%%%%%%%%%
+                %%%%%%%%%%%%%%%%%%%%%% ADD NODES AND EDGES IN GRAPH %%%%%%%%%%
                 
-                 if (findnode(obj.g, string(src))==0)
-                     obj.g = addnode(obj.g, string(src));
-                     obj.g = addedge(obj.g, string(obj.ID), string(src));
-                 end
-                 %%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%
+                if (findnode(obj.g, string(src))==0)
+                    obj.g = addnode(obj.g, string(src));
+                    obj.g = addedge(obj.g, string(obj.ID), string(src));
+                end
+                %%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%
 
-                 if length(data) > 3
+                if length(data) > 3
                     for r = 4:(length(data))
                         temp = str2num(data(r));
                         if (isempty(obj.One_hope(obj.One_hope==temp))) && (obj.ID~=temp) % se obj não existir na lista de um salto e for vizinho
@@ -102,9 +103,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
 
         function [obj,netManager,WPTManager] = handleTimer(obj,GlobalTime,netManager,WPTManager)
 
-            v = neighbors(obj.g, string(obj.ID)); %Verifica se exite vizinho
-
-            if (obj.wantAck == false) && isempty(v) %caso não tenha vizinho
+            if obj.wantAck == false
                 obj.payload = ['0','0',string(obj.ID)];
                 payloadLen = length(obj.payload)*32;
                 %canal 0 de (vlc sobre) swipt, 1000bps, 5W
@@ -121,8 +120,6 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                     obj.wantAck = false;
                     obj.listControl = obj.listControl - 1;
                     if obj.listControl == 0
-                        obj.g = graph;
-                        obj.g = addnode(obj.g, string(obj.ID));
                         obj.One_hope = [];
                         obj.two_hope = [];
                         obj.listControl = 4;
@@ -130,6 +127,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                 end
             end
             
+            v = neighbors(obj.g, string(obj.ID));
             peso = [];
             for r = 1:length(v)
                 peso = [peso 4];
