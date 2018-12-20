@@ -104,6 +104,8 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
 
             v = neighbors(obj.g, string(obj.ID)); %Verifica se exite vizinho
 
+            lmpr = mpr(obj);
+
             if (obj.wantAck == false) && isempty(v) %caso não tenha vizinho
                 obj.payload = ['0','0',string(obj.ID)];
                 payloadLen = length(obj.payload)*32;
@@ -146,4 +148,5 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
         end
 
     end
+
 end
