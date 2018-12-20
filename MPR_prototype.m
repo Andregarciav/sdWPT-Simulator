@@ -21,9 +21,9 @@ figure(1)
 ID = 5;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  Aqui começa o MPR     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-v = neighbors(g, string(ID));
-lista = zeros(numnodes(g)); %Cria a Lista independente de vizinhos
-M_AD = full(adjacency(g));
+v = neighbors(g, string(ID))
+lista = zeros(numnodes(g)) %Cria a Lista independente de vizinhos
+M_AD = full(adjacency(g))
 lMPR = [];
 V_vn = [];
 vizinho = false

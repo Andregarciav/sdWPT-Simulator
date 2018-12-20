@@ -8,6 +8,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
         cont = 0;
         payload = [];
         listControl = 4;
+        lmpr = [];
     end
     methods
         function obj = powerRXApplication_dummieCoils(id)
@@ -96,15 +97,17 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
 
 
             obj.APPLICATION_LOG.DATA = ['One Hope list = ', string(obj.One_hope),...
-                                    'Two Hope list = ', string(obj.two_hope)];%'Exemplo de log';
+                                    'Two Hope list = ', string(obj.two_hope),...
+                                    'MPR list = ', string(obj.lmpr)];%'Exemplo de log';
+            
             
         end
 
         function [obj,netManager,WPTManager] = handleTimer(obj,GlobalTime,netManager,WPTManager)
 
             v = neighbors(obj.g, string(obj.ID)); %Verifica se exite vizinho
-
-            lmpr = mpr(obj);
+            
+            obj.lmpr = mpr(obj);
 
             if (obj.wantAck == false) && isempty(v) %caso não tenha vizinho
                 obj.payload = ['0','0',string(obj.ID)];
@@ -141,10 +144,17 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                 obj.payload = ['2','0',string(obj.ID)];
                 netManager = send(obj, netManager, str2num(v(r)), obj.payload,length(obj.payload)*32, GlobalTime);
             end
-            
-            netManager = setTimer(obj,netManager,GlobalTime,obj.interval); %realimenta a simulação com novo evento de tempo
+
             figure(obj.ID);
                 plot (obj.g);
+                highlight(plot (obj.g),string(obj.ID),'NodeColor', [0 0.75 0]);
+                %highlight(plot (obj.g),v,'NodeColor', 'red');
+                %highlight(plot (obj.g),string(obj.ID),v,'EdgeColor', 'red');
+                %highlight(plot (obj.g),string(obj.lmpr),'NodeColor', [0 0 1]);
+            
+            netManager = setTimer(obj,netManager,GlobalTime,obj.interval); %realimenta a simulação com novo evento de tempo
+            
+            
         end
 
     end
