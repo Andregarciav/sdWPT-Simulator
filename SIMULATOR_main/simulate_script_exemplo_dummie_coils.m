@@ -3,7 +3,7 @@
 clear all;
 
 %MANTENHA ISSO ATUALIZADO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-NRX = 23; %n�mero de dispositivos transmissores
+NRX = 5; %n�mero de dispositivos transmissores
 TOTAL_TIME = 100;%segundos de simula��o (em tempo virtual)
 
 %ASPECTOS GERAIS (DUMMIE)-------------------------------------------------------
@@ -78,6 +78,6 @@ for i=2:length(LOG_app_list)
     disp(['For RX ',num2str(i-1),':']);
     disp('--------------------------------------');
     disp(LOG_app_list(i).DATA);
-    %figure(i - 1)
-     %   plot(LOG_app_list(i).g)
+    figure(i - 1)
+       plot(LOG_app_list(i).DATA.g)
 end

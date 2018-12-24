@@ -95,10 +95,10 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                 obj.two_hope(obj.two_hope == obj.One_hope(r)) = [];
             end
 
-
-            obj.APPLICATION_LOG.DATA = ['One Hope list = ', string(obj.One_hope),...
-                                    'Two Hope list = ', string(obj.two_hope),...
-                                    'MPR list = ', string(obj.lmpr)];%'Exemplo de log';
+            obj.APPLICATION_LOG.DATA = obj;
+            %obj.APPLICATION_LOG.DATA = ['One Hope list = ', string(obj.One_hope),...
+             %                       'Two Hope list = ', string(obj.two_hope),...
+              %                      'MPR list = ', string(obj.lmpr)];%'Exemplo de log';
             
             
         end
@@ -145,9 +145,9 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                 netManager = send(obj, netManager, str2num(v(r)), obj.payload,length(obj.payload)*32, GlobalTime);
             end
 
-            figure(obj.ID);
-                plot (obj.g);
-                highlight(plot (obj.g),string(obj.ID),'NodeColor', [0 0.75 0]);
+            %figure(obj.ID);
+            %    plot (obj.g);
+            %    highlight(plot (obj.g),string(obj.ID),'NodeColor', [0 0.75 0]);
                 %highlight(plot (obj.g),v,'NodeColor', 'red');
                 %highlight(plot (obj.g),string(obj.ID),v,'EdgeColor', 'red');
                 %highlight(plot (obj.g),string(obj.lmpr),'NodeColor', [0 0 1]);
