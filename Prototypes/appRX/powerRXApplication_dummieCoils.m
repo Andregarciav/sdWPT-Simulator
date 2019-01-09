@@ -2,7 +2,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
     properties
         interval = 2;
         mpr_ant = [];
-        %two_hope = [];
+        oneHope = [];
         g = graph
         wantAck = false;
         cont = 0;
@@ -46,13 +46,19 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             if msgType == 0
                 
                 v = neighbors(obj.g, string(obj.ID));
-            
-                if isempty(v)
-                    obj.g = addnode(obj.g, string(src));
-                    obj.g = addedge(obj.g, string(obj.ID), string(src));
-                end
+                
+                %if isempty(v)
+                 %   obj.oneHope = [src;2];
+                  %  obj.g = addnode(obj.g, string(src));
+                  %  obj.g = addedge(obj.g, string(obj.ID), string(src));
+                %end
                 
                 if (findnode(obj.g, string(src))==0)
+                    if isempty (obj.oneHope(obj.oneHope==src))
+                        obj.oneHope = [obj.oneHope [src;2]];
+                    else
+                        obj.oneHope(2,find(obj.oneHope(1,:) == src)) = 2;        
+                    end
                     obj.g = addnode(obj.g, string(src));
                     obj.g = addedge(obj.g, string(obj.ID), string(src));
                 end
@@ -77,7 +83,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                 if (isempty(obj.mpr_ant == src) == 0) && (ttl > 1)
                     data;
                     if (findnode(obj.g, string(dst)) == 0) %se eu não conheço reencaminha a msg
-                        data = [data string(obj.ID)];
+                        data = [data string(obj.ID)]; % Não faz parte do protocolo, só pra saber o caminho
                         obj.payload = constructPayload (obj,1,src,dst,ttl,data);
                     elseif (findnode(obj.g, string(dst)) ~= 0)
                         obj.payload = constructPayload (obj,3,src,dst,ttl,data);
@@ -97,7 +103,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                         obj.mpr_ant = [obj.mpr_ant src];
                     end
                 end
-            %msg do tipo 3 é a mensagem quando
+            %msg do tipo 3 é a mensagem quando está a no máximo dois saltos do destinatário
             elseif msgType == 3
                 
                 if dst == obj.ID
@@ -115,9 +121,26 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
         end
 
         function [obj,netManager,WPTManager] = handleTimer(obj,GlobalTime,netManager,WPTManager)
+            
+            %reconfigurarando a lista de vizinhos
+            if isempty(obj.oneHope)==0
+                if length(obj.oneHope(1,:)) == 1
+                    obj.oneHope(2,1) = obj.oneHope(2,1) - 1;
+                else
+                    for r=1:length(obj.oneHope)
+                        obj.oneHope(2,r) = obj.oneHope(2,r) - 1;
+                    end
+                end
+                %Caso após duas rodas não tenha recebido msg do vizinho o nó é retirado
+                while isempty(find(obj.oneHope==0)) == 0
+                    %remove vizinho do grafo
+                    obj.g = rmedge(obj.g,string(obj.ID),string(obj.oneHope(find(obj.oneHope==0,1,'first')/2)));
+                    obj.g = rmnode(obj.g,string(obj.oneHope(find(obj.oneHope==0,1,'first')/2)));
+                    %remove da lista de controle dos vizinhos
+                    obj.oneHope(:,find(obj.oneHope==0,1,'first')/2) = [];
+                end
+            end
 
-            
-            
             v = neighbors(obj.g, string(obj.ID)); %Verifica se exite vizinho
             
             obj.payload = constructPayload(obj,0,0,0,0,0);
