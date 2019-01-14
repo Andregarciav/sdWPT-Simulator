@@ -3,7 +3,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
         interval = 2;
         mpr_ant = [];
         oneHope = [];
-        g = graph
+        g = graph;
         wantAck = false;
         cont = 0;
         seqNumber = 0;

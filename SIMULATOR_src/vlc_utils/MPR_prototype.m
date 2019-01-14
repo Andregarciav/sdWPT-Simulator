@@ -81,7 +81,7 @@ elseif(length(v)==0)
     lMPR = []; %transformar em lista de MPR
 end
 
-
+verificaMPR(g,ID,lMPR)
 
     
     
