@@ -12,7 +12,7 @@ function verificaMPR(g,ID,lMPR)
                 if isempty(list_twoHop(list_twoHop == str2num(twoHop(s)))) &&...
                            isempty(listaVizinhos(listaVizinhos == str2num(twoHop(s)))) &&...
                            str2num(twoHop(s)) ~= ID  
-                    list_twoHop = [list_twoHop str2num(twoHop(s))]
+                    list_twoHop = [list_twoHop str2num(twoHop(s))];
                 end
             end
         end
@@ -21,7 +21,7 @@ function verificaMPR(g,ID,lMPR)
             v = neighbors(g, string(lMPR(r)));
             for s=1:length(v)
                 if str2num(v(s)) ~= ID
-                    list_twoHop(list_twoHop == str2num(v(s))) = []
+                    list_twoHop(list_twoHop == str2num(v(s))) = [];
                 end
             end
         end

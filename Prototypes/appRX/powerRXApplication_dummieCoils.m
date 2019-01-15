@@ -38,7 +38,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             ttl = ttl - 1;                  %   Decrementando o TTL
             %%%%%%%%%%%%%%%%%%%% Tratando a mensagem
             if ttl < 0
-                break;
+                return;
             end
             
             %Mensagem do tipo 0, é uma mensagem de construção da topologia da rede
@@ -137,7 +137,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             obj = setSendOptions(obj, 0, 25000,5);
             netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
 
-            obj.lmpr = mpr(obj);
+            obj.lmpr = mpr(obj.g,obj.ID);
             
             %   Envia a lista MPR, caso ela não esteja vazia
             if ~(isempty(obj.lmpr)) 
@@ -157,7 +157,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
 
             netManager = setTimer(obj,netManager,GlobalTime,obj.interval); %realimenta a simulação com novo evento de tempo
             
-            
+            obj.APPLICATION_LOG.DATA = obj;   
         end
 
     end

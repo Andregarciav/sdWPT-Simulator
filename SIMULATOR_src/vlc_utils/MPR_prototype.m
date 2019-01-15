@@ -33,7 +33,7 @@ figure(1)
     plot(g)
 
 %   Chama função MPR
-lMPR = mpr(g,ID)
+lMPR = mpr(g,ID);
 %   Verifica se todos os vizinhos a dois saltos, estão cobertos pela lista de mpr
 verificaMPR(g,ID,lMPR)
 
