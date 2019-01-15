@@ -25,44 +25,42 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
         end
 
         function [obj,netManager,WPTManager] = handleMessage(obj,data,GlobalTime,netManager,WPTManager)
-            data;
             %%%%%%%%%%%%%%%%%%%%%% Decodificando cabeçalho
-            msgType = str2num(data(1)); %tipo de msg recebida
-            Number = str2num(data(2));
-            msg_len = str2num(data(3));
-            noAnterior = str2num(data(4));
-            src = str2num(data(5));
-            dst = str2num(data(6));
-            ttl = str2num(data(7));
+            msgType = str2num(data(1));     %   Tipo de msg recebida
+            Number = str2num(data(2));      %   Número de sequência da msg
+            msg_len = str2num(data(3));     %   Tamanho da msg, desconsiderando cabeçalho
+            noAnterior = str2num(data(4));  %   Nó por qual a msg chegou
+            src = str2num(data(5));         %   Nó que originou a msg
+            dst = str2num(data(6));         %   Qual é o destino da msg
+            ttl = str2num(data(7));         %   Time to live da msg
             %%%%%%%%%%%%%%%%%%%%%% Atualizando parâmetros
-            data; %debug
-            
-            data = data(8:end);
-            ttl = ttl - 1;
+            data = data(8:end);             %   Retirando cabeçalho
+            ttl = ttl - 1;                  %   Decrementando o TTL
             %%%%%%%%%%%%%%%%%%%% Tratando a mensagem
-            
+            if ttl < 0
+                break;
+            end
             
             %Mensagem do tipo 0, é uma mensagem de construção da topologia da rede
             if msgType == 0
-                
-                v = neighbors(obj.g, string(obj.ID));
-                
-                %if isempty(v)
-                 %   obj.oneHope = [src;2];
-                  %  obj.g = addnode(obj.g, string(src));
-                  %  obj.g = addedge(obj.g, string(obj.ID), string(src));
-                %end
-                
+                %Verifica se o nó que originou a msg já está no grafo
                 if (findnode(obj.g, string(src))==0)
+                    %   Verifica se o nó está na lista de controle
+                    %   A lista de controle mantem atualizada quantas rodadas
+                    %   Os o nó não recebe msg de cada vizinho 
                     if isempty (obj.oneHope(obj.oneHope==src))
                         obj.oneHope = [obj.oneHope [src;2]];
                     else
-                        obj.oneHope(2,find(obj.oneHope(1,:) == src)) = 2;        
+                        obj.oneHope(2,find(obj.oneHope(1,:) == src)) = 2;   % 2 significa 0 rodadas sem receber,
+                                                                            % esse númro decresce até 0.     
                     end
+                    %Adicionando os nós no grafo e adicionando as arestas
                     obj.g = addnode(obj.g, string(src));
                     obj.g = addedge(obj.g, string(obj.ID), string(src));
                 end
                 
+                %Caso o nó originário ja conheça algum vizinho,
+                %Adiciona os vizinhos desse nó no grafo
                 if msg_len > 1
                     for r = 1:msg_len
                         temp = str2num(data(r));
@@ -75,17 +73,14 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                         end
                     end
                 end
-                
             %mensagem do tipo 1 é mensagem de broadcast trafegando pela rede
             elseif msgType == 1
-                %disp(['MSG type 1 rcv! ',string(obj.ID)]); %%%%% Debug
-                %disp(['TTL:  ',string(ttl)]);  %%%%% Debug
                 if (isempty(obj.mpr_ant == src) == 0) && (ttl > 1)
                     data;
-                    if (findnode(obj.g, string(dst)) == 0) %se eu não conheço reencaminha a msg
+                    if (findnode(obj.g, string(dst)) == 0) %se não conheço reencaminha a msg
                         data = [data string(obj.ID)]; % Não faz parte do protocolo, só pra saber o caminho
                         obj.payload = constructPayload (obj,1,src,dst,ttl,data);
-                    elseif (findnode(obj.g, string(dst)) ~= 0)
+                    elseif (findnode(obj.g, string(dst)) ~= 0) %%se conheço transformo a msg tipo 1 em tipo 3 e encaminho
                         obj.payload = constructPayload (obj,3,src,dst,ttl,data);
                         disp(['Sou o no, ',string(obj.ID),' e conheço o no',string(dst),'.'])
                     end
@@ -97,7 +92,8 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                 end
             %mensagem do tipo 2 é mensagem informando aos vizinhos quais são seu mpr
             elseif msgType == 2
-                
+                %   Caso o nó esteja na lista MPR recebida é armazenado na estrutura de controle
+%%%%%%%%%%%%%%%%%%%%%%%% Ainda falta fazer retirar
                 if ~(isempty(strcmp(data, string(obj.ID))))
                     if isempty(obj.mpr_ant == src)
                         obj.mpr_ant = [obj.mpr_ant src];
@@ -105,7 +101,6 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                 end
             %msg do tipo 3 é a mensagem quando está a no máximo dois saltos do destinatário
             elseif msgType == 3
-                
                 if dst == obj.ID
                     disp(data)
                 elseif (isempty(obj.mpr_ant == src) == 0) && (findnode(obj.g, string(src)) ~= 0) && (ttl > 0)
@@ -113,11 +108,8 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                     obj = setSendOptions(obj, 0, 25000,5);
                     netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
                 end
-
             end
-
             obj.APPLICATION_LOG.DATA = obj;        
-            
         end
 
         function [obj,netManager,WPTManager] = handleTimer(obj,GlobalTime,netManager,WPTManager)
@@ -140,16 +132,15 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                     obj.oneHope(:,find(obj.oneHope==0,1,'first')/2) = [];
                 end
             end
-
-            v = neighbors(obj.g, string(obj.ID)); %Verifica se exite vizinho
             
             obj.payload = constructPayload(obj,0,0,0,0,0);
             obj = setSendOptions(obj, 0, 25000,5);
             netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
 
             obj.lmpr = mpr(obj);
-        
-            if (isempty(obj.lmpr) == 0)
+            
+            %   Envia a lista MPR, caso ela não esteja vazia
+            if ~(isempty(obj.lmpr)) 
                 obj.payload = constructPayload(obj,2,0,0,0,0);
                 obj = setSendOptions(obj, 0, 25000,5);
                 netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
@@ -158,7 +149,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             %%%%%% FUNÇÃO DE TESTE  %%%%%%%%%
             if (obj.ID == 4) && (GlobalTime > 8) && (GlobalTime < 9)
                 data = ['Oi eu sou o 4.'];
-                            % ConstructPayload(obj,msgType,ID_origem,ID_dst,ttl,data) 
+                % Paramêtros  ConstructPayload(obj,msgType,ID_origem,ID_dst,ttl,data) 
                 obj.payload = constructPayload(obj, 1, obj.ID, 19, 16, data);
                 obj = setSendOptions(obj, 0, 25000,5);
                 netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
