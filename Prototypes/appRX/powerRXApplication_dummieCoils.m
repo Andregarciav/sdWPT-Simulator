@@ -113,7 +113,6 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
         end
 
         function [obj,netManager,WPTManager] = handleTimer(obj,GlobalTime,netManager,WPTManager)
-            
             %reconfigurarando a lista de vizinhos
             if isempty(obj.oneHope)==0
                 if length(obj.oneHope(1,:)) == 1
@@ -138,7 +137,6 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
 
             obj.lmpr = mpr(obj.g,obj.ID);
-            
             %   Envia a lista MPR, caso ela não esteja vazia
             if ~(isempty(obj.lmpr)) 
                 obj.payload = constructPayload(obj,2,0,0,0,0);
