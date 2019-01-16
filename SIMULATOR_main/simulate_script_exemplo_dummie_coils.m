@@ -80,11 +80,9 @@ for i=2:length(LOG_app_list)
     disp('--------------------------------------');
     %disp(LOG_app_list(i).DATA);
     figure(1)
-        hold on
         p = plot(LOG_app_list(i).DATA.g);
         highlight(p,string(i-1),'NodeColor', [0 0.75 0]);
         %highlight(p,v,'NodeColor', 'red');
         highlight(p,string(i-1),neighbors(LOG_app_list(i).DATA.g,string(i-1)),'EdgeColor', 'red');
         highlight(p,string(LOG_app_list(i).DATA.lmpr),'NodeColor', 'red');
 end
-        hold off
