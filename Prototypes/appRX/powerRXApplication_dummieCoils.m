@@ -1,15 +1,12 @@
 classdef powerRXApplication_dummieCoils < powerRXApplication
     properties
-        interval = 2;
-        mpr_ant = [];
-        oneHope = [];
-        g = graph;
-        wantAck = false;
-        cont = 0;
-        seqNumber = 0;
-        payload = [];
-        listControl = 4;
-        lmpr = [];
+        interval = 2;       %   Intervalo entre as rodadas
+        mpr_ant = [];       %   Lista de nós que sou MPR
+        oneHope = [];       %   Nós a um salto, usado como controle para retirar um nó da lista de vizinhos
+        g = graph;          %   grafo do nó, vizinhos e vizinhos de vizinhos
+        seqNumber = 0;      %   Usado para numero de sequencia
+        payload = [];       %   Carga útil a ser enviado, pode vir das camadas superiores ou para construir a topologia
+        lmpr = [];          %   lista de nós MPR para o nó
     end
     methods
         function obj = powerRXApplication_dummieCoils(id)
@@ -37,9 +34,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             data = data(8:end);             %   Retirando cabeçalho
             ttl = ttl - 1;                  %   Decrementando o TTL
             %%%%%%%%%%%%%%%%%%%% Tratando a mensagem
-            if ttl < 0
-                return;
-            end
+           
             
             %Mensagem do tipo 0, é uma mensagem de construção da topologia da rede
             if msgType == 0
@@ -93,10 +88,14 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             %mensagem do tipo 2 é mensagem informando aos vizinhos quais são seu mpr
             elseif msgType == 2
                 %   Caso o nó esteja na lista MPR recebida é armazenado na estrutura de controle
-%%%%%%%%%%%%%%%%%%%%%%%% Ainda falta fazer retirar
                 if ~(isempty(strcmp(data, string(obj.ID))))
                     if isempty(obj.mpr_ant == src)
                         obj.mpr_ant = [obj.mpr_ant src];
+                    end
+                end
+                if ~isempty(obj.mpr_ant == src)
+                    if isempty(strcmp(data, string(obj.ID)))
+                        obj.mpr_ant(obj.mpr_ant == src) = [];
                     end
                 end
             %msg do tipo 3 é a mensagem quando está a no máximo dois saltos do destinatário
@@ -135,7 +134,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             obj.payload = constructPayload(obj,0,0,0,0,0);
             obj = setSendOptions(obj, 0, 25000,5);
             netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
-
+            %   Obtem a lista de MPR
             obj.lmpr = mpr(obj.g,obj.ID);
             %   Envia a lista MPR, caso ela não esteja vazia
             if ~(isempty(obj.lmpr)) 
@@ -145,7 +144,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             end
             
             %%%%%% FUNÇÃO DE TESTE  %%%%%%%%%
-            if (obj.ID == 4) && (GlobalTime > 8) && (GlobalTime < 9)
+            if (obj.ID == 4) && (GlobalTime > 8) && (GlobalTime < 50)
                 data = ['Oi eu sou o 4.'];
                 % Paramêtros  ConstructPayload(obj,msgType,ID_origem,ID_dst,ttl,data) 
                 obj.payload = constructPayload(obj, 1, obj.ID, 19, 16, data);
