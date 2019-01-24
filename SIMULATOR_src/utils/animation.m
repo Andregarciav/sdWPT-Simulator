@@ -1,4 +1,4 @@
-%Mostra a animação da movimentação das bobinas em uma ambiente ao longo do
+%Mostra a animaï¿½ï¿½o da movimentaï¿½ï¿½o das bobinas em uma ambiente ao longo do
 %tempo
 function animation(eList,dtime,ds)
     h = plot3(NaN,NaN,NaN,'-'); %initiallize plot. Get a handle to graphic object
@@ -27,7 +27,8 @@ function animation(eList,dtime,ds)
             end
 			try
 				set(h, 'XData', px, 'YData', py, 'ZData', pz);
-				drawnow %you can probably remove this line, as pause already calls drawnow
+                drawnow %you can probably remove this line, as pause already calls drawnow
+                
 			catch
 				quit = true;
 				break;
