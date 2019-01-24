@@ -16,11 +16,7 @@ function [LOG_TX,LOG_dev_list,LOG_app_list] = Simulate(ENV_LIST_FILE,NTX,R,C,W,T
 		error('EnvList not found.');
 	end
 	
-<<<<<<< HEAD
-	%insere novos valores de capacit�ncia caso desejado
-=======
 	%insert new capacitance values if wanted. -1 if you want to disable this functionality
->>>>>>> 6822c91354a0eac5ee268c103a63696b2d0abcfb
 	if(length(envList(1).C_group)~=length(C))
 		error('C dimension and the number of groups must agree');
 	end
@@ -28,11 +24,7 @@ function [LOG_TX,LOG_dev_list,LOG_app_list] = Simulate(ENV_LIST_FILE,NTX,R,C,W,T
 		envList(i).C_group = envList(i).C_group + (C~=-1).*(C-envList(i).C_group);
 	end
 	
-<<<<<<< HEAD
-	%Os objetos abaixo cuidam de aspactos f�sicos de WPT
-=======
 	%The objects below manages the physical aspects of WPT
->>>>>>> 6822c91354a0eac5ee268c103a63696b2d0abcfb
 	if exist('miEnv','var')
 		elManager = envListManager(envList,zeros(NTX,1),W,R,TOTAL_TIME,MAX_ERR,R_MAX,IFACTOR,DFACTOR,INIT_VEL,MAX_ACT_POWER,MAX_APP_POWER,miEnv);
 	else
@@ -41,26 +33,13 @@ function [LOG_TX,LOG_dev_list,LOG_app_list] = Simulate(ENV_LIST_FILE,NTX,R,C,W,T
 	
 	Manager = envListManagerBAT(elManager,DEVICE_LIST,STEP,SHOW_PROGRESS);
 	
-<<<<<<< HEAD
-	%inicializando a tens�o dos aparatos transmissores
-=======
 	%initializing the voltage across the TX coils
->>>>>>> 6822c91354a0eac5ee268c103a63696b2d0abcfb
 	Manager = setVt(Manager, zeros(NTX,1), 0);
 	
 	%The object below manages network and timing envents
 	network = networkManager(length(envList(1).R_group)-NTX);
 	
 	if(powerTX.ID~=0)
-<<<<<<< HEAD
-		%ID=0 indica que � uma aplica��o de TX
-		error('powerTX is not a powerTXApplication');
-	end
-	%� executada a fun��o de inicializa��o do TX
-	[powerTX,network,Manager] = init(powerTX,network,Manager);
-	
-	%S�o executadas as fun��es de inicializa��o dos RX
-=======
 		%ID=0 means the application is attached to the transmitting device
 		error('powerTX is not a powerTXApplication');
 	end
@@ -68,7 +47,6 @@ function [LOG_TX,LOG_dev_list,LOG_app_list] = Simulate(ENV_LIST_FILE,NTX,R,C,W,T
 	[powerTX,network,Manager] = init(powerTX,network,Manager);
 	
 	%Initializing the other applications
->>>>>>> 6822c91354a0eac5ee268c103a63696b2d0abcfb
 	for i=1:length(powerRX);
 		if(powerRX(i).obj.ID~=i)
 			error('ID of powerRX(i) must be equals to its index in powerRX vector');
@@ -108,13 +86,8 @@ function [LOG_TX,LOG_dev_list,LOG_app_list] = Simulate(ENV_LIST_FILE,NTX,R,C,W,T
 			break;
 		end
 		
-<<<<<<< HEAD
-        %Resultados desta execu��o para fins de log (acesso direto a medi��es, com onisci�ncia)
-		[~,~,~,~,Manager] = getSystemState(Manager,GlobalTime);%atualiza o sistema a cada evento
-=======
         %Get some measurements for logging purposes (the measurements are inserted into the log objects inside Manager
 		[~,~,~,~,Manager] = getSystemState(Manager,GlobalTime);
->>>>>>> 6822c91354a0eac5ee268c103a63696b2d0abcfb
         
 		if(event.owner==0)%the destinatary is TX
 			if(event.isMsg)
@@ -130,11 +103,7 @@ function [LOG_TX,LOG_dev_list,LOG_app_list] = Simulate(ENV_LIST_FILE,NTX,R,C,W,T
 				
 				%evaluates via SINR if the message is meant to be sent
 				if(rightDelivered(event,conflictingMsgs,Manager,B_SWIPT,B_RF,A_RF,N_SWIPT,N_RF,Z))
-<<<<<<< HEAD
-					%fun��o de tratamento de mensagens do destinat�rio
-=======
 					%callback the handler function of the message receiver
->>>>>>> 6822c91354a0eac5ee268c103a63696b2d0abcfb
 					[powerTX, network, Manager] = handleMessage(powerTX,event.data,GlobalTime,network,Manager);
 				else
 					warningMsg('Dropped message: ',['from powerRX id ',num2str(event.creator),' to powerTX']);
