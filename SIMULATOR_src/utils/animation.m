@@ -1,7 +1,8 @@
-%Mostra a animação da movimentação das bobinas em uma ambiente ao longo do
+%Mostra a animaï¿½ï¿½o da movimentaï¿½ï¿½o das bobinas em uma ambiente ao longo do
 %tempo
 function animation(eList,dtime,ds)
-    h = plot3(NaN,NaN,NaN,'-'); %initiallize plot. Get a handle to graphic object
+    h = scatter3(NaN,NaN,NaN,'filled'); %initiallize plot. Get a handle to graphic object
+    
     X = [];Y = [];Z = [];
     for i=1:length(eList)
         for j=1:length(eList(i).Coils)
@@ -26,7 +27,8 @@ function animation(eList,dtime,ds)
                 pz = [pz eList(i).Coils(j).obj.z];
             end
 			try
-				set(h, 'XData', px, 'YData', py, 'ZData', pz);
+                set(h, 'XData', px, 'YData', py, 'ZData', pz);
+                %patch([px nan],[py nan],[pz nan],[pz nan],'EdgeColor','interp','FaceColor','none')
 				drawnow %you can probably remove this line, as pause already calls drawnow
 			catch
 				quit = true;

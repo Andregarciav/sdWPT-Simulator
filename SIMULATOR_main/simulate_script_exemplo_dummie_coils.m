@@ -4,7 +4,7 @@ clear all;
 
 %MANTENHA ISSO ATUALIZADO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 NRX = 33; %n�mero de dispositivos transmissores
-TOTAL_TIME = 20;%segundos de simula��o (em tempo virtual)
+TOTAL_TIME = 60;%segundos de simula��o (em tempo virtual)
 
 %ASPECTOS GERAIS (DUMMIE)-------------------------------------------------------
 W = 1e6;
@@ -79,7 +79,7 @@ for i=2:length(LOG_app_list)
     disp(['For RX ',num2str(i-1),':']);
     disp('--------------------------------------');
     %disp(LOG_app_list(i).DATA);
-    figure(1)
+    figure(i-1)
         p = plot(LOG_app_list(i).DATA.g);
         highlight(p,string(i-1),'NodeColor', [0 0.75 0]);
         %highlight(p,v,'NodeColor', 'red');
