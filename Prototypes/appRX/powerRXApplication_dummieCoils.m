@@ -75,9 +75,12 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                     if (findnode(obj.g, string(dst)) == 0) %se não conheço reencaminha a msg
                         data = [data string(obj.ID)]; % Não faz parte do protocolo, só pra saber o caminho
                         obj.payload = constructPayload (obj,1,src,dst,ttl,data);
-                    elseif (findnode(obj.g, string(dst)) ~= 0) %%se conheço transformo a msg tipo 1 em tipo 3 e encaminho
+                    elseif (findnode(obj.g, string(dst)) ~= 0 && dst ~= obj.ID) %%se conheço transformo a msg tipo 1 em tipo 3 e encaminho
                         obj.payload = constructPayload (obj,3,src,dst,ttl,data);
                         disp(['Sou o no, ',string(obj.ID),' e conheço o no',string(dst),'.'])
+                    elseif dst == obj.ID
+                        disp (noAnterior)
+                        disp (data)
                     end
                         obj = setSendOptions(obj, 0, 25000,5);
                         netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
@@ -101,6 +104,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             %msg do tipo 3 é a mensagem quando está a no máximo dois saltos do destinatário
             elseif msgType == 3
                 if dst == obj.ID
+                    disp (noAnterior)
                     disp(data)
                 elseif (isempty(obj.mpr_ant == src) == 0) && (findnode(obj.g, string(src)) ~= 0) && (ttl > 0)
                     obj.payload = constructPayload (obj,3,src,dst,0,data);
@@ -146,8 +150,16 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             %%%%%% FUNÇÃO DE TESTE  %%%%%%%%%
             if (obj.ID == 4) && (GlobalTime > 8) && (GlobalTime < 50)
                 data = ['Oi eu sou o 4.'];
-                % Paramêtros  ConstructPayload(obj,msgType,ID_origem,ID_dst,ttl,data) 
-                obj.payload = constructPayload(obj, 1, obj.ID, 19, 16, data);
+                sendto = randi([1, 33])
+                while sendto == obj.ID
+                    sendto = randi([1, 33])
+                end
+                % Paramêtros  ConstructPayload(obj,msgType,ID_origem,ID_dst,ttl,data)
+                if (isempty(findnode(obj.g,string(sendto)))) 
+                    obj.payload = constructPayload(obj, 1, obj.ID, sendto, 16, data);
+                else
+                    obj.payload = constructPayload(obj, 3, obj.ID, sendto, 1, data);
+                end
                 obj = setSendOptions(obj, 0, 25000,5);
                 netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
             end

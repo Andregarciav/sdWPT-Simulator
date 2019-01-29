@@ -1,7 +1,7 @@
 %Mostra a anima��o da movimenta��o das bobinas em uma ambiente ao longo do
 %tempo
 function animation(eList,dtime,ds)
-    h = scatter3(NaN,NaN,NaN,'filled'); %initiallize plot. Get a handle to graphic object
+    h = scatter3(NaN,NaN,NaN,'o'); %initiallize plot. Get a handle to graphic object
     
     X = [];Y = [];Z = [];
     for i=1:length(eList)

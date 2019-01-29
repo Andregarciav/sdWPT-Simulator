@@ -87,4 +87,7 @@ for i=2:length(LOG_app_list)
         %highlight(p,v,'NodeColor', 'red');
         highlight(p,string(i-1),neighbors(LOG_app_list(i).DATA.g,string(i-1)),'EdgeColor', 'red');
         highlight(p,string(LOG_app_list(i).DATA.lmpr),'NodeColor', 'red');
+
+
+      
 end

@@ -13,20 +13,21 @@ function SINR = SINR_RF(WPTManager,message,conflictList,t)
 % Ângulo entre transmissor e receptor
     Trasnmissor_Angle = (pos(message.creator+1,3)-pos(message.owner+1,3) / d);
 % Parâmetro R de fi
-    R_fi = ((m + 1) * (Trasnmissor_Angle)^m) / 2 * pi;
+    R_fi = ((m + 1) * (Trasnmissor_Angle)^m) / 2 * pi; %Emissão de Lambert
 
     Receive_Angle = dot(Ori(message.owner+1,:),pos(message.creator+1,:)-pos(message.owner+1,:))...
                     / norm(Ori(message.owner+1,:)) * norm(pos(message.creator+1,:)-pos(message.owner+1,:));
- 
+    
+    Vr = calculateLambda(pos(message.owner+1,:), Ori(message.owner+1,:), pos(message.creator+1,:));
 
     H_0 = R_fi * (A/d^2) * Receive_Angle;
 
     prob = [88.53 80 60 40 20 0]/100; % Probabilidade do pacote ser entregue
     dista = [0 10 354 425 462 500]; % Distância de  transmissão em cm
 
-    p = interp1 (dista, prob, d);
+    p = interp1 (dista, prob, d, 'pchip');
 
-    if (rand < p) && (Receive_Angle < 0.5) && (Receive_Angle > -0.5)
+    if (rand < p) && (Receive_Angle < 0.5) && (Receive_Angle > -0.5) && (Vr > 0) && (Vr < 1)
         SINR = 1;
     else
         SINR = 0;
