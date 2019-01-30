@@ -16,7 +16,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
 
         function [obj,netManager,WPTManager] = init(obj,netManager,WPTManager)
         	GlobalTime = 0;
-        	intervalo = rand;%20+rand*80;%random interval between 20s and 100s
+        	intervalo = rand*5;%20+rand*80;%random interval between 20s and 100s
             netManager = setTimer(obj,netManager,GlobalTime,intervalo);
             obj.seqNumber = randi(65536);%numero de sequência
         end
@@ -39,6 +39,9 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             %Mensagem do tipo 0, é uma mensagem de construção da topologia da rede
             if msgType == 0
                 %Verifica se o nó que originou a msg já está no grafo
+                %disp(data)
+                %disp(obj.ID)
+                %disp(src)
                 if (findnode(obj.g, string(src))==0)
                     %   Verifica se o nó está na lista de controle
                     %   A lista de controle mantem atualizada quantas rodadas
@@ -46,7 +49,8 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                     if isempty (obj.oneHope(obj.oneHope==src))
                         obj.oneHope = [obj.oneHope [src;2]];
                     else
-                        obj.oneHope(2,find(obj.oneHope(1,:) == src)) = 2;   % 2 significa 0 rodadas sem receber,
+                        %%%%%%%%%%%%%%%%%%%%%%%%%%  ATENÇÂO Numero de rodadas infinito
+                        obj.oneHope(2,find(obj.oneHope(1,:) == src)) = inf;   % 2 significa 0 rodadas sem receber,
                                                                             % esse númro decresce até 0.     
                     end
                     %Adicionando os nós no grafo e adicionando as arestas
@@ -112,6 +116,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                     netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
                 end
             end
+            %salvando log
             obj.APPLICATION_LOG.DATA = obj;        
         end
 
@@ -148,18 +153,23 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             end
             
             %%%%%% FUNÇÃO DE TESTE  %%%%%%%%%
-            if (obj.ID == 4) && (GlobalTime > 8) && (GlobalTime < 50)
+            if (obj.ID == 1) && (GlobalTime > 8) && (GlobalTime < 50)
+                %Mensagem a ser enviada
                 data = ['Oi eu sou o 4.'];
-                sendto = randi([1, 33])
+                %sorteia um nó para enviar a mensagem
+                sendto = randi([1, 33]);
+                %para não enviar para ele msm
                 while sendto == obj.ID
-                    sendto = randi([1, 33])
+                    sendto = randi([1, 33]);
                 end
-                % Paramêtros  ConstructPayload(obj,msgType,ID_origem,ID_dst,ttl,data)
+                %se conhece msg tipo 3, se não msg tipo 1
                 if (isempty(findnode(obj.g,string(sendto)))) 
+                    % Paramêtros  ConstructPayload(obj,msgType,ID_origem,ID_dst,ttl,data)
                     obj.payload = constructPayload(obj, 1, obj.ID, sendto, 16, data);
                 else
                     obj.payload = constructPayload(obj, 3, obj.ID, sendto, 1, data);
                 end
+                %Enviando
                 obj = setSendOptions(obj, 0, 25000,5);
                 netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
             end

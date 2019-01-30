@@ -1,4 +1,4 @@
-function lambda = calculeLambda(Position,Center,Transmissor)
+function lambda = calculeLambda(c,n,a)
     
 
 %    gamaX = Transmissor(1)*Center(1) - Center(1)*Position(1)...
@@ -20,5 +20,5 @@ function lambda = calculeLambda(Position,Center,Transmissor)
 %            - Center(3)*Position(3) - Position(3)*Transmissor(3);
     
 %    lambda =  - (gamaX + gamaY + gamaZ) / BetaX + BetaY + BetaZ;
-    lambda = ((Position - Center)*(Center - Transmissor).')/((Position - Center)*(Position - Transmissor).');
+    lambda = ((n*c.') - (n*a.')) / ((n*(n+c).') - (n*a.'));
 end

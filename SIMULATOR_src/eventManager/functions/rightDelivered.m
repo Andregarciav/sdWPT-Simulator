@@ -4,8 +4,9 @@ function r = rightDelivered(message,messageLists,WPTManager,...
     %TODO: descontar a energia gasta
     r = true;
     out = false;
-    
-    step = (message.time1-message.time0)/10;
+    nSamples = 10;
+
+    step = (message.time1-message.time0)/nSamples;
     
     t = message.time0 + step;
     
@@ -44,7 +45,7 @@ function r = rightDelivered(message,messageLists,WPTManager,...
         switch(message.options.type)
             case 0 %vlc
                 SINR = SINR_VLC(WPTManager,message,...
-                    conflictList,t);
+                    conflictList,t,nSamples);
                 if(SINR<B_SWIPT)
                     r = false;
                     out = true;
@@ -58,5 +59,10 @@ function r = rightDelivered(message,messageLists,WPTManager,...
                 end
         end
         t = t + step;
+    end
+    if r
+        disp(['Entregue: from ',num2str(message.creator),' to ',num2str(message.owner)])
+    else
+        disp(['Nao entregue: from ',num2str(message.creator),' to ',num2str(message.owner)])
     end
 end

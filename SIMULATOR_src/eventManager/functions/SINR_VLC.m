@@ -1,33 +1,56 @@
-function SINR = SINR_RF(WPTManager,message,conflictList,t)
+%PARAMETROS:
+%nSamples: qtd de vezes que essa função é chamada para uma mensagem
+function SINR = SINR_RF(WPTManager,message,conflictList,t,nSamples)
 % Adquirindo posição e orientação de troca de msg
+    %centro do Objeto
     pos = getCenterPositions(WPTManager.ENV,t);
+    % Orientação da normal
     Ori = getOrientations(WPTManager.ENV,t);
 
-% Parametros adquiridos de artigo
-    Fi_half = 60; %Angulo de emissão da sinal
-    m = log(0.5)/log(cos(Fi_half * pi / 180));
-    A = 1e-4; % area do fotodiodo
+    % Atenção aos nomes
+    Vs = Ori(message.creator+1,:); %Normal ao LED emissor
+    Vr = Ori(message.owner+1,:); %Normal ao LED Receptor
+    Cs = pos(message.creator+1,:); %Centro do Emissor
+    Cr = pos(message.owner+1,:); %Centro do Receptor
+    Vrs = Cs - Cr; % Vetor em Cr que aponta para Cs, ou seja vetor que aponta do receptor para o emissor
+%Lambda do receptor e do emissor
+    Lambda_recieve = calculateLambda(Cr,Vr,Cs);
+    Lambda_transmissor = calculateLambda(Cs,Vs,Cr);
+    if ((Lambda_recieve < 0  ||   Lambda_recieve > 1) && (Lambda_transmissor < 0  ||   Lambda_transmissor > 1))
+    % Distância entre os nós
+        d = norm(Cs-Cr);
+    %Calculando parametros cossenos
+        cos_FI = (Cs(3) - Cr(3)) / d;
+        cos_teta = dot(Vr,Vrs)/(norm(Vr) * norm(Vrs));
+    % Parametros adquiridos de artigo
+        half_power_angle = 60 * (pi/180); % Ângulo de meia potência
+        detector_surface = 1e-4; % area do fotodiodo
+    %calculando a radiação
+        m = log(0.5)/log(cos(half_power_angle)); %Constante de emissão de Lambert ~1.
+        radiation = ((m+1) * (cos_FI)^m) / 2*pi; %Radiação dependente do angulo do emissor
+    %Ganho DC
+        dc_gain = radiation * (detector_surface/d^2)*cos_teta;  % Ganho do foto receptor
+    % Potência Recebida
+        P_recieve = message.options.power * dc_gain;
+    else
+        SINR = 0;
+    end
 
-% Distância entre os nós
-    d = norm(pos(message.creator+1,:)-pos(message.owner+1,:));
-% Ângulo entre transmissor e receptor
-    Trasnmissor_Angle = (pos(message.creator+1,3)-pos(message.owner+1,3) / d);
-% Parâmetro R de fi
-    R_fi = ((m + 1) * (Trasnmissor_Angle)^m) / 2 * pi; %Emissão de Lambert
 
     Receive_Angle = dot(Ori(message.owner+1,:),pos(message.creator+1,:)-pos(message.owner+1,:))...
                     / norm(Ori(message.owner+1,:)) * norm(pos(message.creator+1,:)-pos(message.owner+1,:));
     
     Vr = calculateLambda(pos(message.owner+1,:), Ori(message.owner+1,:), pos(message.creator+1,:));
+    if (Vr < 0) && (Vr > 1)
+        disp(['VR',Vr])
+    end
 
-    H_0 = R_fi * (A/d^2) * Receive_Angle;
-
-    prob = [88.53 80 60 40 20 0]/100; % Probabilidade do pacote ser entregue
+    prob = ([88.53 80 60 40 20 0]/100).^(1/nSamples); % Probabilidade do pacote ser entregue
     dista = [0 10 354 425 462 500]; % Distância de  transmissão em cm
 
-    p = interp1 (dista, prob, d, 'pchip');
+    p = interp1 (dista, prob, norm(Cs-Cr), 'pchip');
 
-    if (rand < p) && (Receive_Angle < 0.5) && (Receive_Angle > -0.5) && (Vr > 0) && (Vr < 1)
+    if (rand < p) && ((Lambda_recieve < 0  ||   Lambda_recieve > 1) && (Lambda_transmissor < 0  ||   Lambda_transmissor > 1))
         SINR = 1;
     else
         SINR = 0;

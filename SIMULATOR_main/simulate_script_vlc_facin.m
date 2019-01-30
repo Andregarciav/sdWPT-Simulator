@@ -6,7 +6,7 @@ noWarnings();%comente se quiser warnings
 
 %MANTENHA ISSO ATUALIZADO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 NRX = 2; %n�mero de dispositivos transmissores
-TOTAL_TIME = 60;%segundos de simula��o (em tempo virtual)
+TOTAL_TIME = 600;%segundos de simula��o (em tempo virtual)
 
 %ASPECTOS GERAIS (DUMMIE)-------------------------------------------------------
 W = 1e6;
