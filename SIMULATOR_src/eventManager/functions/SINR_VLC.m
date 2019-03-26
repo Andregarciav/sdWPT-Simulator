@@ -13,6 +13,7 @@ function SINR = SINR_RF(WPTManager,message,conflictList,t,nSamples)
     Cs = pos(message.creator+1,:); %Centro do Emissor
     Cr = pos(message.owner+1,:); %Centro do Receptor
     Vrs = Cs - Cr; % Vetor em Cr que aponta para Cs, ou seja vetor que aponta do receptor para o emissor
+    Vsr = Cr - Cs; % Vetor em Cs que aponta para Cr, ou seja vetor que aponta do emissor para o receptor
 %Lambda do receptor e do emissor
     Lambda_recieve = calculateLambda(Cr,Vr,Cs);
     Lambda_transmissor = calculateLambda(Cs,Vs,Cr);
@@ -20,16 +21,17 @@ function SINR = SINR_RF(WPTManager,message,conflictList,t,nSamples)
     % Distância entre os nós
         d = norm(Cs-Cr);
     %Calculando parametros cossenos
-        cos_FI = (Cs(3) - Cr(3)) / d;
+        %cos_FI = (Cs(3) - Cr(3)) / d
+        cos_FI =  dot(Vs,Vsr)/(norm(Vs) * norm(Vsr));
         cos_teta = dot(Vr,Vrs)/(norm(Vr) * norm(Vrs));
     % Parametros adquiridos de artigo
         half_power_angle = 60 * (pi/180); % Ângulo de meia potência
         detector_surface = 1e-4; % area do fotodiodo
     %calculando a radiação
         m = log(0.5)/log(cos(half_power_angle)); %Constante de emissão de Lambert ~1.
-        radiation = ((m+1) * (cos_FI)^m) / 2*pi; %Radiação dependente do angulo do emissor
+        radiation = ((m+1) * (cos_FI)^m) / 2*pi %Radiação dependente do angulo do emissor
     %Ganho DC
-        dc_gain = radiation * (detector_surface/d^2)*cos_teta;  % Ganho do foto receptor
+        dc_gain = radiation * (detector_surface/d^2)*cos_teta  % Ganho do foto receptor
     % Potência Recebida
         P_recieve = message.options.power * dc_gain;
     else

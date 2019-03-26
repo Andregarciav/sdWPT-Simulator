@@ -41,14 +41,14 @@ y = 0.25;
 z = 0;
 group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
     wire_radius,pts,mi),x,y,z);
-    group.coils.obj = rotateCoilX(group.coils.obj,pi/2);
+    group.coils.obj = rotateCoilX(group.coils.obj,-pi/2);
 %group.coils.obj = rotateCoilX(rotateCoilY(group.coils.obj,pi/2),pi/2); % rotacionar as instâncias vlc
 group.R = -1;group.C = -1;
 group_list = [group_list;group];
 
 %definindo outro nó
 x = 0;
-y = 0.50;
+y = 0.35;
 z = 0;
 group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
     wire_radius,pts,mi),x,y,z);
