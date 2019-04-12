@@ -24,7 +24,7 @@ pts = 2; %resolução do caminho
 
 %AQUI É ONDE VOCÊ VAI MEXER DE FATO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 %coordenadas da posição em metros
-group_list = [];
+group_list_inicio = [];
 
 %definindo um nó (esse é o powerTX, não altere, pois não será usado)
 x = 0;
@@ -33,7 +33,7 @@ z = 0;
 group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
     wire_radius,pts,mi),x,y,z);
 group.R = -1;group.C = -1;
-group_list = [group_list;group];
+group_list_inicio = [group_list_inicio;group];
 
 %definindo um nó (altere a posição (em metros) à vontade)
 x = 0;
@@ -44,7 +44,7 @@ group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
     group.coils.obj = rotateCoilX(group.coils.obj,-pi/2);
 %group.coils.obj = rotateCoilX(rotateCoilY(group.coils.obj,pi/2),pi/2); % rotacionar as instâncias vlc
 group.R = -1;group.C = -1;
-group_list = [group_list;group];
+group_list_inicio = [group_list_inicio;group];
 
 %definindo outro nó
 x = 0;
@@ -54,22 +54,26 @@ group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
     wire_radius,pts,mi),x,y,z);
 group.coils.obj = rotateCoilX(group.coils.obj,pi/2); % rotacionar as instâncias vlc
 group.R = -1;group.C = -1;
-group_list = [group_list;group];
+group_list_inicio = [group_list_inicio;group];
 
+group_list_fim = group_list_inicio;
+group_list_fim(3).coils.obj = translateCoil(group_list_fim(3).coils.obj,0,5.25,0);
 
 %FIM DA SUA ÁREA DE ATUAÇÃO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 %w = 1e+5 é apenas um valor default. A frequência é de fato definida a posteriori   
-envPrototype = Environment(group_list,w,mi);
+env_inicio = Environment(group_list_inicio,w,mi);
+ok_inicio = check(env_inicio);
 
-envList = [envPrototype,envPrototype];
+env_fim = Environment(group_list_fim,w,mi);
+ok_fim = check(env_fim);
 
-ok = check(envPrototype);
+envList = [env_inicio,env_fim];
 
-if(ok)
+if(ok_inicio && ok_fim)
     
-    envList(1) = evalM(envList(1), zeros(length(group_list)));
-    envList(2) = evalM(envList(2), zeros(length(group_list)));
+    envList(1) = evalM(envList(1), zeros(length(group_list_inicio)));
+    envList(2) = evalM(envList(2), zeros(length(group_list_fim)));
 
     if savefile
         save(file,'envList');

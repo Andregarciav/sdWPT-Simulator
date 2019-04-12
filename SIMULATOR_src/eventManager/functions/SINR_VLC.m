@@ -8,18 +8,18 @@ function SINR = SINR_RF(WPTManager,message,conflictList,t,nSamples)
     Ori = getOrientations(WPTManager.ENV,t);
 
     % Atenção aos nomes
-    Vs = Ori(message.creator+1,:); %Normal ao LED emissor
-    Vr = Ori(message.owner+1,:); %Normal ao LED Receptor
+    Vs = Ori(message.creator+1,:); %Normal ao Plano do emissor
+    Vr = Ori(message.owner+1,:); %Normal ao plano do Receptor
     Cs = pos(message.creator+1,:); %Centro do Emissor
     Cr = pos(message.owner+1,:); %Centro do Receptor
     Vrs = Cs - Cr; % Vetor em Cr que aponta para Cs, ou seja vetor que aponta do receptor para o emissor
     Vsr = Cr - Cs; % Vetor em Cs que aponta para Cr, ou seja vetor que aponta do emissor para o receptor
-%Lambda do receptor e do emissor
+    %Lambda do receptor e do emissor
     Lambda_recieve = calculateLambda(Cr,Vr,Cs);
     Lambda_transmissor = calculateLambda(Cs,Vs,Cr);
-    if ((Lambda_recieve < 0  ||   Lambda_recieve > 1) && (Lambda_transmissor < 0  ||   Lambda_transmissor > 1))
-    % Distância entre os nós
-        d = norm(Cs-Cr);
+    if ((Lambda_recieve < 0  ||  Lambda_recieve > 1) && (Lambda_transmissor < 0  ||  Lambda_transmissor > 1))     % Caso os valores os lambdas fiquem entre 0 e 1,
+    % Distância entre os nós                                                                                      % significa que o raio luminoso de sinal cruzou
+        d = norm(Cs-Cr);                                                                                          % o plano do receptor.
     %Calculando parametros cossenos
         %cos_FI = (Cs(3) - Cr(3)) / d
         cos_FI =  dot(Vs,Vsr)/(norm(Vs) * norm(Vsr));
@@ -31,9 +31,22 @@ function SINR = SINR_RF(WPTManager,message,conflictList,t,nSamples)
         m = log(0.5)/log(cos(half_power_angle)); %Constante de emissão de Lambert ~1.
         radiation = ((m+1) * (cos_FI)^m) / 2*pi %Radiação dependente do angulo do emissor
     %Ganho DC
-        dc_gain = radiation * (detector_surface/d^2)*cos_teta  % Ganho do foto receptor
-    % Potência Recebida
-        P_recieve = message.options.power * dc_gain;
+        dc_gain = radiation * (detector_surface/d^2)*cos_teta;  % Ganho do foto receptor deve ser acima de 0.00063662
+        
+        if (dc_gain < 0.00063662)
+            SINR = 0;
+        else
+            prob = ([88.53 80 60 40 20 0]/100).^(1/nSamples); % Probabilidade do pacote ser entregue
+            dista = [0 10 354 425 462 500]; % Distância de  transmissão em cm
+
+            p = interp1 (dista, prob, norm(Cs-Cr), 'pchip'); %interpolação entre os dados probabilisticos recolhidos empiricamente
+            
+            if (rand < p)
+                SINR = 1;
+            else
+                SINR = 0;
+            end
+        end
     else
         SINR = 0;
     end
@@ -47,10 +60,7 @@ function SINR = SINR_RF(WPTManager,message,conflictList,t,nSamples)
         disp(['VR',Vr])
     end
 
-    prob = ([88.53 80 60 40 20 0]/100).^(1/nSamples); % Probabilidade do pacote ser entregue
-    dista = [0 10 354 425 462 500]; % Distância de  transmissão em cm
-
-    p = interp1 (dista, prob, norm(Cs-Cr), 'pchip');
+    
 
     if (rand < p) && ((Lambda_recieve < 0  ||   Lambda_recieve > 1) && (Lambda_transmissor < 0  ||   Lambda_transmissor > 1))
         SINR = 1;
