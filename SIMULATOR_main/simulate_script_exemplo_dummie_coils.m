@@ -1,6 +1,6 @@
 %This script is a simple demonstration of the network aspects of the simulator
 
-clear all;
+% clear all;
 
 noWarnings();%comente se quiser warnings
 
@@ -82,12 +82,12 @@ for i=2:length(LOG_app_list)
     disp(['For RX ',num2str(i-1),':']);
     disp('--------------------------------------');
     %disp(LOG_app_list(i).DATA);
-    figure(i-1)
-        p = plot(LOG_app_list(i).DATA.g);
-        highlight(p,string(i-1),'NodeColor', [0 0.75 0]);
-        %highlight(p,v,'NodeColor', 'red');
-        highlight(p,string(i-1),neighbors(LOG_app_list(i).DATA.g,string(i-1)),'EdgeColor', 'red');
-        highlight(p,string(LOG_app_list(i).DATA.lmpr),'NodeColor', 'red');
+    % figure(i-1)
+    %     p = plot(LOG_app_list(i).DATA.g);
+    %     highlight(p,string(i-1),'NodeColor', [0 0.75 0]);
+    %     %highlight(p,v,'NodeColor', 'red');
+    %     highlight(p,string(i-1),neighbors(LOG_app_list(i).DATA.g,string(i-1)),'EdgeColor', 'red');
+    %     highlight(p,string(LOG_app_list(i).DATA.lmpr),'NodeColor', 'red');
 
 
       

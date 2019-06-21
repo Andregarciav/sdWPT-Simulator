@@ -4,7 +4,7 @@ clear all;
 savefile = true;%salvar depois da execução?
 plotAnimation = true;%mostrar a animação?
 
-file = 'env_vlc_2move.mat';%arquivo para onde irão os ambientes
+file = 'env_vlc_3move.mat';%arquivo para onde irão os ambientes
 
 %Parâmetros DUMMIE------------------------------------------------------------------------------------------------
 w = 1e+5;%frequência angular padrão (dummie)
@@ -46,6 +46,18 @@ group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
 group.R = -1;group.C = -1;
 group_list_inicio = [group_list_inicio;group];
 
+%definindo um nó (altere a posição (em metros) à vontade)
+%definindo outro nó
+x = 0.5;
+y = 0.5;
+z = 0;
+group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
+    wire_radius,pts,mi),x,y,z);
+group.coils.obj = rotateCoilY(group.coils.obj,-pi/2); % rotacionar as instâncias vlc
+group.R = -1;group.C = -1;
+group_list_inicio = [group_list_inicio;group];
+
+
 %definindo outro nó
 x = 0;
 y = 0.35;
@@ -57,7 +69,9 @@ group.R = -1;group.C = -1;
 group_list_inicio = [group_list_inicio;group];
 
 group_list_fim = group_list_inicio;
-group_list_fim(3).coils.obj = translateCoil(group_list_fim(3).coils.obj,0,5.25,0);
+group_list_fim(4).coils.obj = translateCoil(group_list_fim(4).coils.obj,0,5.25,0);
+
+
 
 %FIM DA SUA ÁREA DE ATUAÇÃO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

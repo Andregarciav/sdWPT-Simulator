@@ -54,7 +54,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                     if isempty (obj.oneHope(obj.oneHope==src))
                         obj.oneHope = [obj.oneHope [src;2]];
                     else
-                        obj.oneHope(2,find(obj.oneHope(1,:) == src)) = inf;   % 2 significa 0 rodadas sem receber,
+                        obj.oneHope(2,find(obj.oneHope(1,:) == src)) = 2;   % 2 significa 0 rodadas sem receber,
                                                                             % esse númro decresce até 0.     
                     end
                     %Adicionando os nós no grafo e adicionando as arestas
@@ -90,6 +90,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                         disp (noAnterior)
                         disp (data)
                     end
+                        obj.seqNumber = obj.seqNumber+1;
                         obj = setSendOptions(obj, 0, 25000,5);
                         netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
                 end
@@ -117,6 +118,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                 elseif (isempty(obj.mpr_ant == src) == 0) && (findnode(obj.g, string(src)) ~= 0) && (ttl > 0)
                     obj.payload = constructPayload (obj,3,src,dst,0,data);
                     obj = setSendOptions(obj, 0, 25000,5);
+                    obj.seqNumber = obj.seqNumber+1;
                     netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
                 end
             end

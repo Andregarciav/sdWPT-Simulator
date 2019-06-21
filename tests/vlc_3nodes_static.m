@@ -1,10 +1,11 @@
 %(THIS IS AN EXAMPLE FOR THE ONES WHO WANT TO USE THIS SIMULATOR AS A SIMPLE NETWORK SIMULATOR.)
 clear all;
+clc;
 
 savefile = true;%salvar depois da execução?
 plotAnimation = true;%mostrar a animação?
 
-file = 'env_vlc_2move.mat';%arquivo para onde irão os ambientes
+file = 'env_vlc_3static.mat';%arquivo para onde irão os ambientes
 
 %Parâmetros DUMMIE------------------------------------------------------------------------------------------------
 w = 1e+5;%frequência angular padrão (dummie)
@@ -48,7 +49,7 @@ group_list_inicio = [group_list_inicio;group];
 
 %definindo outro nó
 x = 0;
-y = 0.35;
+y = 1;
 z = 0;
 group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
     wire_radius,pts,mi),x,y,z);
@@ -56,8 +57,17 @@ group.coils.obj = rotateCoilX(group.coils.obj,pi/2); % rotacionar as instâncias
 group.R = -1;group.C = -1;
 group_list_inicio = [group_list_inicio;group];
 
-group_list_fim = group_list_inicio;
-group_list_fim(3).coils.obj = translateCoil(group_list_fim(3).coils.obj,0,5.25,0);
+%definindo outro nó
+x = 0.5;
+y = 0.5;
+z = 0;
+group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
+    wire_radius,pts,mi),x,y,z);
+group.coils.obj = rotateCoilY(group.coils.obj,-pi/2); % rotacionar as instâncias vlc
+group.R = -1;group.C = -1;
+group_list_inicio = [group_list_inicio;group];
+% group_list_fim = group_list_inicio;
+% group_list_fim(3).coils.obj = translateCoil(group_list_fim(3).coils.obj,0,5.25,0);
 
 %FIM DA SUA ÁREA DE ATUAÇÃO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -65,15 +75,15 @@ group_list_fim(3).coils.obj = translateCoil(group_list_fim(3).coils.obj,0,5.25,0
 env_inicio = Environment(group_list_inicio,w,mi);
 ok_inicio = check(env_inicio);
 
-env_fim = Environment(group_list_fim,w,mi);
-ok_fim = check(env_fim);
+% env_fim = Environment(group_list_fim,w,mi);
+% ok_fim = check(env_fim);
 
-envList = [env_inicio,env_fim];
+envList = [env_inicio,env_inicio];
 
-if(ok_inicio && ok_fim)
+if(ok_inicio)
     
     envList(1) = evalM(envList(1), zeros(length(group_list_inicio)));
-    envList(2) = evalM(envList(2), zeros(length(group_list_fim)));
+    envList(2) = evalM(envList(2), zeros(length(group_list_inicio)));
 
     if savefile
         save(file,'envList');
