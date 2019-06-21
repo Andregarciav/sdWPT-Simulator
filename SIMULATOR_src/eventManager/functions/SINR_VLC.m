@@ -1,7 +1,7 @@
 %PARAMETROS:
 %nSamples: qtd de vezes que essa função é chamada para uma mensagem
 function SINR = SINR_RF(WPTManager,message,conflictList,t,nSamples)
-% Adquirindo posição e orientação de troca de msg
+    % Adquirindo posição e orientação de troca de msg
     %centro do Objeto
     pos = getCenterPositions(WPTManager.ENV,t);
     % Orientação da normal
@@ -17,53 +17,42 @@ function SINR = SINR_RF(WPTManager,message,conflictList,t,nSamples)
     %Lambda do receptor e do emissor
     Lambda_recieve = calculateLambda(Cr,Vr,Cs);
     Lambda_transmissor = calculateLambda(Cs,Vs,Cr);
-    if ((Lambda_recieve < 0  ||  Lambda_recieve > 1) && (Lambda_transmissor < 0  ||  Lambda_transmissor > 1))     % Caso os valores os lambdas fiquem entre 0 e 1,
-    % Distância entre os nós                                                                                      % significa que o raio luminoso de sinal cruzou
+    %teste se emissor e receptor não estão de costas
+    if ((Lambda_recieve < 0  ||  Lambda_recieve > 1)...
+        && (Lambda_transmissor < 0  ||  Lambda_transmissor > 1))     % Caso os valores os lambdas fiquem entre 0 e 1,
+        % Distância entre os nós                                                                                      % significa que o raio luminoso de sinal cruzou
         d = norm(Cs-Cr);                                                                                          % o plano do receptor.
-    %Calculando parametros cossenos
+        %Calculando parametros cossenos
         %cos_FI = (Cs(3) - Cr(3)) / d
         cos_FI =  dot(Vs,Vsr)/(norm(Vs) * norm(Vsr));
         cos_teta = dot(Vr,Vrs)/(norm(Vr) * norm(Vrs));
-    % Parametros adquiridos de artigo
+        % Parametros adquiridos de artigo
         half_power_angle = 60 * (pi/180); % Ângulo de meia potência
         detector_surface = 1e-4; % area do fotodiodo
-    %calculando a radiação
+        %calculando a radiação
         m = log(0.5)/log(cos(half_power_angle)); %Constante de emissão de Lambert ~1.
-        radiation = ((m+1) * (cos_FI)^m) / 2*pi %Radiação dependente do angulo do emissor
-    %Ganho DC
-        dc_gain = radiation * (detector_surface/d^2)*cos_teta;  % Ganho do foto receptor deve ser acima de 0.00063662
+        radiation = ((m+1) * (cos_FI)^m) / 2*pi; %Radiação dependente do angulo do emissor
+        %Ganho DC
+        dc_gain = radiation * (detector_surface/d^2)*cos_teta; % Ganho do foto receptor deve ser acima de 0.00063662
         
-        if (dc_gain < 0.00063662)
-            SINR = 0;
-        else
+        % if (dc_gain < 0.00063662)
+        %     SINR = 0;
+        % else
             prob = ([88.53 80 60 40 20 0]/100).^(1/nSamples); % Probabilidade do pacote ser entregue
-            dista = [0 10 354 425 462 500]; % Distância de  transmissão em cm
+            dista = [0 10 354 425 462 500]/100; % Distância de  transmissão em cm
 
-            p = interp1 (dista, prob, norm(Cs-Cr), 'pchip'); %interpolação entre os dados probabilisticos recolhidos empiricamente
-            
-            if (rand < p)
+            regre = polyfit (dista, prob, 5);% Gera os coeficientes da regressão polinomial
+
+            x = sqrt(radiation* detector_surface / dc_gain);
+            %p = interp1 (dista, prob, d, 'pchip'); %interpolação entre os dados probabilisticos recolhidos empiricamente
+            pro = regre(1)*x.^5 + regre(2)*x.^4 + regre(3)*x.^3 + regre(4)*x.^2 + regre(5)*x +regre(6);
+
+            if (rand <= pro)
                 SINR = 1;
             else
                 SINR = 0;
             end
-        end
-    else
-        SINR = 0;
-    end
-
-
-    Receive_Angle = dot(Ori(message.owner+1,:),pos(message.creator+1,:)-pos(message.owner+1,:))...
-                    / norm(Ori(message.owner+1,:)) * norm(pos(message.creator+1,:)-pos(message.owner+1,:));
-    
-    Vr = calculateLambda(pos(message.owner+1,:), Ori(message.owner+1,:), pos(message.creator+1,:));
-    if (Vr < 0) && (Vr > 1)
-        disp(['VR',Vr])
-    end
-
-    
-
-    if (rand < p) && ((Lambda_recieve < 0  ||   Lambda_recieve > 1) && (Lambda_transmissor < 0  ||   Lambda_transmissor > 1))
-        SINR = 1;
+        % end
     else
         SINR = 0;
     end

@@ -1,24 +1,26 @@
 classdef powerRXApplication_dummieCoils < powerRXApplication
     properties
-        interval = 2;       %   Intervalo entre as rodadas
+        interval;       %   Intervalo entre as rodadas
         mpr_ant = [];       %   Lista de nós que sou MPR
         oneHope = [];       %   Nós a um salto, usado como controle para retirar um nó da lista de vizinhos
         g = graph;          %   grafo do nó, vizinhos e vizinhos de vizinhos
         seqNumber = 0;      %   Usado para numero de sequencia
         payload = [];       %   Carga útil a ser enviado, pode vir das camadas superiores ou para construir a topologia
         lmpr = [];          %   lista de nós MPR para o nó
+        lmsgReceive = [];   %   lista numero de msg recebidas de nós
     end
     methods
-        function obj = powerRXApplication_dummieCoils(id)
+        function obj = powerRXApplication_dummieCoils(id,interval)
             obj@powerRXApplication(id);%construindo a estrutura referente �superclasse
             obj.g = addnode(obj.g,string(obj.ID));
+            obj.interval = interval;
         end
 
         function [obj,netManager,WPTManager] = init(obj,netManager,WPTManager)
         	GlobalTime = 0;
         	intervalo = rand*5;%20+rand*80;%random interval between 20s and 100s
             netManager = setTimer(obj,netManager,GlobalTime,intervalo);
-            obj.seqNumber = randi(65536);%numero de sequência
+            %obj.seqNumber = randi(65536);%numero de sequência
         end
 
         function [obj,netManager,WPTManager] = handleMessage(obj,data,GlobalTime,netManager,WPTManager)
@@ -34,8 +36,11 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             data = data(8:end);             %   Retirando cabeçalho
             ttl = ttl - 1;                  %   Decrementando o TTL
             %%%%%%%%%%%%%%%%%%%% Tratando a mensagem
-           
-            
+            if isempty(obj.lmsgReceive(obj.lmsgReceive == noAnterior))
+                obj.lmsgReceive = [obj.lmsgReceive [noAnterior;1]];
+            else
+                obj.lmsgReceive(2,find(obj.lmsgReceive(1,:) == noAnterior)) = obj.lmsgReceive(2,find(obj.lmsgReceive(1,:) == noAnterior))+1; 
+            end
             %Mensagem do tipo 0, é uma mensagem de construção da topologia da rede
             if msgType == 0
                 %Verifica se o nó que originou a msg já está no grafo
@@ -49,7 +54,6 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                     if isempty (obj.oneHope(obj.oneHope==src))
                         obj.oneHope = [obj.oneHope [src;2]];
                     else
-                        %%%%%%%%%%%%%%%%%%%%%%%%%%  ATENÇÂO Numero de rodadas infinito
                         obj.oneHope(2,find(obj.oneHope(1,:) == src)) = inf;   % 2 significa 0 rodadas sem receber,
                                                                             % esse númro decresce até 0.     
                     end
@@ -108,7 +112,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             %msg do tipo 3 é a mensagem quando está a no máximo dois saltos do destinatário
             elseif msgType == 3
                 if dst == obj.ID
-                    disp (noAnterior)
+                    disp (['O no',string(noAnterior), 'Enviou a mensagem: '])
                     disp(data)
                 elseif (isempty(obj.mpr_ant == src) == 0) && (findnode(obj.g, string(src)) ~= 0) && (ttl > 0)
                     obj.payload = constructPayload (obj,3,src,dst,0,data);
@@ -139,14 +143,15 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                     obj.oneHope(:,find(obj.oneHope==0,1,'first')/2) = [];
                 end
             end
-            
+            obj.seqNumber = obj.seqNumber+1;
             obj.payload = constructPayload(obj,0,0,0,0,0);
             obj = setSendOptions(obj, 0, 25000,5);
             netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
             %   Obtem a lista de MPR
             obj.lmpr = mpr(obj.g,obj.ID);
             %   Envia a lista MPR, caso ela não esteja vazia
-            if ~(isempty(obj.lmpr)) 
+            if ~(isempty(obj.lmpr))
+                obj.seqNumber = obj.seqNumber+1;
                 obj.payload = constructPayload(obj,2,0,0,0,0);
                 obj = setSendOptions(obj, 0, 25000,5);
                 netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
@@ -155,13 +160,15 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             %%%%%% FUNÇÃO DE TESTE  %%%%%%%%%
             if (obj.ID == 1) && (GlobalTime > 8) && (GlobalTime < 50)
                 %Mensagem a ser enviada
-                data = ['Oi eu sou o 4.'];
+                data = ['Oi eu sou o 1.'];
                 %sorteia um nó para enviar a mensagem
-                sendto = randi([1, 33]);
+                sendto = 2;% randi([1, 33]);
+                %incrementa o numero de sequencia
+                obj.seqNumber = obj.seqNumber+1;
                 %para não enviar para ele msm
-                while sendto == obj.ID
-                    sendto = randi([1, 33]);
-                end
+                % while sendto == obj.ID
+                %     sendto = randi([1, 33]);
+                % end
                 %se conhece msg tipo 3, se não msg tipo 1
                 if (isempty(findnode(obj.g,string(sendto)))) 
                     % Paramêtros  ConstructPayload(obj,msgType,ID_origem,ID_dst,ttl,data)

@@ -60,9 +60,9 @@ function r = rightDelivered(message,messageLists,WPTManager,...
         end
         t = t + step;
     end
-    if r
-        disp(['Entregue: from ',num2str(message.creator),' to ',num2str(message.owner)])
-    else
-        disp(['Nao entregue: from ',num2str(message.creator),' to ',num2str(message.owner)])
-    end
+    % if r
+    %     disp(['Entregue: from ',num2str(message.creator),' to ',num2str(message.owner)])
+    % else
+    %     disp(['Nao entregue: from ',num2str(message.creator),' to ',num2str(message.owner)])
+    % end
 end

@@ -40,6 +40,7 @@ efficiency = 0.95; % (95% de efici�ncia de convers�o AC/DC)
 %--------------------------------------------------------------------------------
 
 STEP=0.2;     % (s)
+interval = 2; % intervalo entre chamadas de atividade
 
 dev = genericDeviceWithBattery(bat,power_m,power_sd,minV,minVTO,err,efficiency);
 DEVICE_LIST = [];
@@ -51,7 +52,7 @@ powerTX = powerTXApplication_dummieCoils();
 powerRX = [];
 
 for i=1:NRX
-    powerRX = [powerRX struct('obj',powerRXApplication_dummieCoils(i))];
+    powerRX = [powerRX struct('obj',powerRXApplication_dummieCoils(i, interval))];
 end
 
 %SIMULADOR (DUMMIE)----------------------------------------------------
