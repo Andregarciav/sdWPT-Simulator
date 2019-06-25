@@ -8,6 +8,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
         payload = [];       %   Carga útil a ser enviado, pode vir das camadas superiores ou para construir a topologia
         lmpr = [];          %   lista de nós MPR para o nó
         lmsgReceive = [];   %   lista numero de msg recebidas de nós
+        Position;
     end
     methods
         function obj = powerRXApplication_dummieCoils(id,interval)
@@ -21,6 +22,8 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
         	intervalo = rand*5;%20+rand*80;%random interval between 20s and 100s
             netManager = setTimer(obj,netManager,GlobalTime,intervalo);
             %obj.seqNumber = randi(65536);%numero de sequência
+            p = getCenterPositions (WPTManager.ENV,GlobalTime);
+            obj.Position = p(obj.ID+1);
         end
 
         function [obj,netManager,WPTManager] = handleMessage(obj,data,GlobalTime,netManager,WPTManager)
