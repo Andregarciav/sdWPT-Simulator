@@ -8,7 +8,7 @@ classdef VlcNode < coil
             y=[0,Normal(2)-Centro(2)];
             z=[0,Normal(3)-Centro(3)];
             obj@coil(x,y,z,0);
-            obj = translateCoil(obj,Centro(1),Centro(2),Centro(1));
+            obj = translateCoil(obj,Centro(1),Centro(2),Centro(3));
         end
 
         function r = check(obj)

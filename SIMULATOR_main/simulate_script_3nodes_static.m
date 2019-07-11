@@ -81,7 +81,7 @@ for i=2:length(LOG_app_list)
     disp(' ');
     disp(['For RX ',num2str(i-1),':']);
     disp('--------------------------------------');
-    LOG_app_list(i)
+    LOG_app_list(i);
     %disp(LOG_app_list(i).DATA);
     % figure(i-1)
     %     p = plot(LOG_app_list(i).DATA.g);

@@ -1,5 +1,5 @@
  %(THIS IS AN EXAMPLE FOR THE ONES WHO WANT TO USE THIS SIMULATOR AS A SIMPLE NETWORK SIMULATOR.)
-clear all;
+% clear all;
 
 savefile = true;%salvar depois da execução?
 plotAnimation = true;%mostrar a animação?

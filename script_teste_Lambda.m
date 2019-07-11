@@ -1,4 +1,5 @@
 clear all;
+clc;
 
 for r=1:2000000
     ori = [0 0 1];

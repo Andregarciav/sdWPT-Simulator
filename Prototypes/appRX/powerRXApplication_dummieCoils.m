@@ -27,7 +27,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
         end
 
         function [obj,netManager,WPTManager] = handleMessage(obj,data,GlobalTime,netManager,WPTManager)
-            %%%%%%%%%%%%%%%%%%%%%% Decodificando cabeçalho
+            %%%%%%%%%%%%%%%%%%%%%% Obtendo dados do cabeçalho                       
             msgType = str2num(data(1));     %   Tipo de msg recebida
             Number = str2num(data(2));      %   Número de sequência da msg
             msg_len = str2num(data(3));     %   Tamanho da msg, desconsiderando cabeçalho
@@ -47,9 +47,6 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             %Mensagem do tipo 0, é uma mensagem de construção da topologia da rede
             if msgType == 0
                 %Verifica se o nó que originou a msg já está no grafo
-                %disp(data)
-                %disp(obj.ID)
-                %disp(src)
                 if (findnode(obj.g, string(src))==0)
                     %   Verifica se o nó está na lista de controle
                     %   A lista de controle mantem atualizada quantas rodadas
@@ -179,7 +176,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                     % Paramêtros  ConstructPayload(obj,msgType,ID_origem,ID_dst,ttl,data)
                     obj.payload = constructPayload(obj, 1, obj.ID, sendto, 16, data);
                 else
-                    obj.payload = constructPayload(obj, 3, obj.ID, sendto, 1, data);
+                    obj.payload = constructPayload(obj, 3, obj.ID, sendto, 2, data);
                 end
                 %Enviando
                 obj = setSendOptions(obj, 0, 25000,5);

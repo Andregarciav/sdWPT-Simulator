@@ -35,41 +35,29 @@ group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
 group.R = -1;group.C = -1;
 group_list_inicio = [group_list_inicio;group];
 
-%definindo um nó (altere a posição (em metros) à vontade)
-x = 0;
-y = 0.25;
-z = 0;
-group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
-    wire_radius,pts,mi),x,y,z);
-    group.coils.obj = rotateCoilX(group.coils.obj,-pi/2);
-%group.coils.obj = rotateCoilX(rotateCoilY(group.coils.obj,pi/2),pi/2); % rotacionar as instâncias vlc
+%definindo nó 1
+center = [0.25,0,0];
+normal = [0.26,0,0];
+group.coils.obj = VlcNode(center, normal);
 group.R = -1;group.C = -1;
 group_list_inicio = [group_list_inicio;group];
 
-%definindo um nó (altere a posição (em metros) à vontade)
-%definindo outro nó
-x = 0.5;
-y = 0.5;
-z = 0;
-group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
-    wire_radius,pts,mi),x,y,z);
-group.coils.obj = rotateCoilY(group.coils.obj,-pi/2); % rotacionar as instâncias vlc
+%definindo nó 2
+center = [0.5,0.5,0];
+normal = [0.5,0.49,0];
+group.coils.obj = VlcNode(center, normal);
 group.R = -1;group.C = -1;
 group_list_inicio = [group_list_inicio;group];
 
-
 %definindo outro nó
-x = 0;
-y = 0.35;
-z = 0;
-group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
-    wire_radius,pts,mi),x,y,z);
-group.coils.obj = rotateCoilX(group.coils.obj,pi/2); % rotacionar as instâncias vlc
+center = [0.35,0,0];
+normal = [0.34,0,0];
+group.coils.obj = VlcNode(center, normal);
 group.R = -1;group.C = -1;
 group_list_inicio = [group_list_inicio;group];
 
 group_list_fim = group_list_inicio;
-group_list_fim(4).coils.obj = translateCoil(group_list_fim(4).coils.obj,0,5.25,0);
+group_list_fim(4).coils.obj = translateCoil(group_list_fim(4).coils.obj,5.25,0,0);
 
 
 
@@ -95,6 +83,11 @@ if(ok_inicio && ok_fim)
 
     if plotAnimation
         animation(envList,0.05,0.2);
+        % figure()
+        %     hold on
+        %     for i=2:length(group_list_inicio)
+        %         plotCoil(group_list_inicio(i).coils.obj)
+        %     end
     end
 else
     error('Something is wrong with the environments.')
