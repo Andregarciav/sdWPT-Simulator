@@ -9,12 +9,16 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
         lmpr = [];          %   lista de nós MPR para o nó
         lmsgReceive = [];   %   lista numero de msg recebidas de nós
         Position;
+        pktReceive = [];
+        log_msgtype = [];
     end
     methods
         function obj = powerRXApplication_dummieCoils(id,interval)
             obj@powerRXApplication(id);%construindo a estrutura referente �superclasse
             obj.g = addnode(obj.g,string(obj.ID));
             obj.interval = interval;
+            obj.pktReceive = {obj.ID};
+            obj.log_msgtype = [0 0 0 0];
         end
 
         function [obj,netManager,WPTManager] = init(obj,netManager,WPTManager)
@@ -39,6 +43,8 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             data = data(8:end);             %   Retirando cabeçalho
             ttl = ttl - 1;                  %   Decrementando o TTL
             %%%%%%%%%%%%%%%%%%%% Tratando a mensagem
+
+            obj.log_msgtype(msgType+1) = obj.log_msgtype(msgType+1)+1; 
             if isempty(obj.lmsgReceive(obj.lmsgReceive == noAnterior))
                 obj.lmsgReceive = [obj.lmsgReceive [noAnterior;1]];
             else

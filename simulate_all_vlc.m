@@ -52,17 +52,17 @@ figure('Name','Instancy three nodes one moving')
 
 
 %Simulando instância 5
-simulate_script_exemplo_dummie_coils;
+% simulate_script_exemplo_dummie_coils;
 
-instancia = grafoInstancia(LOG_app_list);
-packetSend      = NumberPacket      (LOG_app_list);
-PacketReceive   = NumberReceive     (LOG_app_list);
-enviados        = [enviados packetSend];
-recebidos       = [recebidos PacketReceive];
-figure('Name','Instancy threeth nodes static')
-    plot(instancia)
-enviados;
-recebidos;
+% instancia = grafoInstancia(LOG_app_list);
+% packetSend      = NumberPacket      (LOG_app_list);
+% PacketReceive   = NumberReceive     (LOG_app_list);
+% enviados        = [enviados packetSend];
+% recebidos       = [recebidos PacketReceive];
+% figure('Name','Instancy threeth nodes static')
+%     plot(instancia)
+% enviados;
+% recebidos;
 
 %Simulando instância 6
 simulate_script_3x3;
@@ -72,6 +72,7 @@ packetSend      = NumberPacket      (LOG_app_list);
 PacketReceive   = NumberReceive     (LOG_app_list);
 enviados        = [enviados packetSend];
 recebidos       = [recebidos PacketReceive];
+
 figure('Name','Instancy nine nodes grid')
     plot(instancia)
 enviados
