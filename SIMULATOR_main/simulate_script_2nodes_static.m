@@ -1,6 +1,6 @@
 %This script is a simple demonstration of the network aspects of the simulator
 
-% clear all;
+clear all;
 
 noWarnings();%comente se quiser warnings
 

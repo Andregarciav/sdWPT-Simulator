@@ -28,19 +28,21 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             %obj.seqNumber = randi(65536);%numero de sequência
             p = getCenterPositions (WPTManager.ENV,GlobalTime);
             obj.Position = p(obj.ID+1);
+            obj = setSendOptions(obj, 0, 25000,5);
         end
 
         function [obj,netManager,WPTManager] = handleMessage(obj,data,GlobalTime,netManager,WPTManager)
+            
             %%%%%%%%%%%%%%%%%%%%%% Obtendo dados do cabeçalho                       
-            msgType = str2num(data(1));     %   Tipo de msg recebida
-            Number = str2num(data(2));      %   Número de sequência da msg
-            msg_len = str2num(data(3));     %   Tamanho da msg, desconsiderando cabeçalho
-            noAnterior = str2num(data(4));  %   Nó por qual a msg chegou
-            src = str2num(data(5));         %   Nó que originou a msg
-            dst = str2num(data(6));         %   Qual é o destino da msg
-            ttl = str2num(data(7));         %   Time to live da msg
+            msgType = data.msgType;     %   Tipo de msg recebida
+            Number = data.number;      %   Número de sequência da msg
+            msg_len = data.msg_len     %   Tamanho da msg, desconsiderando cabeçalho
+            noAnterior = data.noAnterior;  %   Nó por qual a msg chegou
+            src = data.src;         %   Nó que originou a msg
+            dst = data.dst;         %   Qual é o destino da msg
+            ttl = data.ttl;         %   Time to live da msg
             %%%%%%%%%%%%%%%%%%%%%% Atualizando parâmetros
-            data = data(8:end);             %   Retirando cabeçalho
+            data = data.payload             %   Retirando cabeçalho
             ttl = ttl - 1;                  %   Decrementando o TTL
             %%%%%%%%%%%%%%%%%%%% Tratando a mensagem
 
@@ -151,17 +153,22 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                 end
             end
             obj.seqNumber = obj.seqNumber+1;
-            obj.payload = constructPayload(obj,0,0,0,0,0);
-            obj = setSendOptions(obj, 0, 25000,5);
-            netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
+            msg = quadro;
+            pkt = constructPayload(obj);
+            msg = msg.construct(0,obj.seqNumber,0,obj.ID,0,16,pkt);
+            msg = msg.TimeSend (GlobalTime);
+            % obj = setSendOptions(obj, 0, 25000,5);
+            netManager = broadcast(obj,netManager,msg,msg.getLen(),GlobalTime);
             %   Obtem a lista de MPR
             obj.lmpr = mpr(obj.g,obj.ID);
             %   Envia a lista MPR, caso ela não esteja vazia
             if ~(isempty(obj.lmpr))
+                msgType = 2;
                 obj.seqNumber = obj.seqNumber+1;
-                obj.payload = constructPayload(obj,2,0,0,0,0);
-                obj = setSendOptions(obj, 0, 25000,5);
-                netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
+                msg = msg.construct(msgType,obj.seqNumber, 0, obj.ID, 0, 16, []);
+                msg = msg.TimeSend(GlobalTime);
+                % obj = setSendOptions(obj, 0, 25000,5);
+                netManager = broadcast(obj,netManager,msg,msg.getLen,GlobalTime);
             end
             
             %%%%%% FUNÇÃO DE TESTE  %%%%%%%%%
@@ -185,8 +192,6 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                 end
                 %Enviando
                 obj = setSendOptions(obj, 0, 25000,5);
-                s = whos('data');
-                s.bytes
                 netManager = broadcast(obj,netManager,obj.payload,(length(data)*2)+16,GlobalTime);
             end
 
