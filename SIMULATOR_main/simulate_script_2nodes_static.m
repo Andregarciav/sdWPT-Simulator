@@ -1,6 +1,6 @@
 %This script is a simple demonstration of the network aspects of the simulator
 
-clear all;
+% clear all;
 
 noWarnings();%comente se quiser warnings
 
@@ -52,7 +52,7 @@ powerTX = powerTXApplication_dummieCoils();
 powerRX = [];
 
 for i=1:NRX
-    powerRX = [powerRX struct('obj',powerRXApplication_dummieCoils(i, interval))];
+    powerRX = [powerRX struct('obj',powerRXApplication_VLC_MPR(i, interval))];
 end
 
 %SIMULADOR (DUMMIE)----------------------------------------------------

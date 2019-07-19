@@ -1,4 +1,4 @@
-classdef powerRXApplication_dummieCoils < powerRXApplication
+classdef powerRXApplication_VLC_MPR < powerRXApplication
     properties
         interval;       %   Intervalo entre as rodadas
         mpr_ant = [];       %   Lista de nós que sou MPR
@@ -13,12 +13,13 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
         log_msgtype = [];
     end
     methods
-        function obj = powerRXApplication_dummieCoils(id,interval)
+        function obj = powerRXApplication_VLC_MPR(id,interval)
             obj@powerRXApplication(id);%construindo a estrutura referente �superclasse
             obj.g = addnode(obj.g,string(obj.ID));
             obj.interval = interval;
             obj.pktReceive = {obj.ID};
             obj.log_msgtype = [0 0 0 0];
+            
         end
 
         function [obj,netManager,WPTManager] = init(obj,netManager,WPTManager)
@@ -29,10 +30,13 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             p = getCenterPositions (WPTManager.ENV,GlobalTime);
             obj.Position = p(obj.ID+1);
             obj = setSendOptions(obj, 0, 25000,5);
+            disp(['Starting node: ',num2str(obj.ID)])
         end
 
         function [obj,netManager,WPTManager] = handleMessage(obj,data,GlobalTime,netManager,WPTManager)
 
+            disp(['Node: ',num2str(obj.ID)])
+            data
             msg = quadro; %instanciando um novo obj msg
             %TODO: analizar vazão aqui.
             timeInit = data.TimeInit;
@@ -46,7 +50,7 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             dst = data.dst;                 %   Qual é o destino da msg
             ttl = data.ttl;                 %   Time to live da msg
             %%%%%%%%%%%%%%%%%%%%%% Atualizando parâmetros
-            data = data.payload;            %   Retirando cabeçalho
+            carga = data.payload;            %   Retirando cabeçalho
             ttl = ttl - 1;                  %   Decrementando o TTL
             %%%%%%%%%%%%%%%%%%%% Tratando a mensagem
 
@@ -74,16 +78,18 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                     obj.g = addedge(obj.g, string(obj.ID), string(src));
                 end
                 
-                %Caso o nó originário ja conheça algum vizinho,
-                %Adiciona os vizinhos desse nó no grafo
-                if (~isempty(data)) && strcmp(class(data),'string')
+                % Aqui trata o tipo de variável do 
+                if (~isempty(carga)) && strcmp(class(carga),'string') 
                     i = msg_len/4;
                 else
                     i = msg_len;
                 end
+                
+                %Caso o nó originário ja conheça algum vizinho,
+                %Adiciona os vizinhos desse nó no grafo
                 if i > 1
                     for r = 1:i
-                        temp = str2num(data(r));
+                        temp = str2num(carga(r));
                         if (findnode(obj.g, string(temp))==0)
                             obj.g = addnode(obj.g, string(temp));
                             obj.g = addedge(obj.g, string(src), string(temp));
@@ -93,22 +99,26 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                         end
                     end
                 end
+            
             %mensagem do tipo 1 é mensagem de broadcast trafegando pela rede
             elseif msgType == 1
+                %testa se faz parte da lista MPR e se ainda existem saltos no TTL
                 if (isempty(obj.mpr_ant == src) == 0) && (ttl > 1)
                     if (findnode(obj.g, string(dst)) == 0) %se não conheço reencaminha a msg
-                        data = [data string(obj.ID)]; % Não faz parte do protocolo, só pra saber o caminho
-                        obj.payload = constructPayload (obj,1,src,dst,ttl,data);
+                        carga = [carga string(obj.ID)]; % Não faz parte do protocolo, só pra saber o caminho
+                        % obj.payload = constructPayload (obj,1,src,dst,ttl,data);
+                        msg.construct(msgType, Number, obj.ID, src, dst, ttl, carga);
                     elseif (findnode(obj.g, string(dst)) ~= 0 && dst ~= obj.ID) %%se conheço transformo a msg tipo 1 em tipo 3 e encaminho
-                        obj.payload = constructPayload (obj,3,src,dst,ttl,data);
+                        % obj.payload = constructPayload (obj,3,src,dst,ttl,data);
+                        msg.construct(3, Number, obj.ID, src, dst, ttl, carga);
                         disp(['Sou o no, ',num2str(obj.ID),' e conheço o no',num2str(dst),'.'])
                     elseif dst == obj.ID
                         disp (noAnterior)
-                        disp (data)
+                        disp (carga)
                     end
-                        obj.seqNumber = obj.seqNumber+1;
-                        obj = setSendOptions(obj, 0, 25000,5);
-                        netManager = broadcast(obj,netManager,obj.payload,length(obj.payload)*32,GlobalTime);
+                        % obj.seqNumber = obj.seqNumber+1;
+                        % obj = setSendOptions(obj, 0, 25000,5);
+                        netManager = broadcast(obj,netManager,msg,msg.getLen(),GlobalTime);
                 end
                 if ttl == 1
                     disp('Drop MSG!!!')
@@ -116,13 +126,13 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             %mensagem do tipo 2 é mensagem informando aos vizinhos quais são seu mpr
             elseif msgType == 2
                 %   Caso o nó esteja na lista MPR recebida é armazenado na estrutura de controle
-                if ~(isempty(strcmp(data, string(obj.ID))))
+                if ~(isempty(strcmp(carga, string(obj.ID))))
                     if isempty(obj.mpr_ant == src)
                         obj.mpr_ant = [obj.mpr_ant src];
                     end
                 end
                 if ~isempty(obj.mpr_ant == src)
-                    if isempty(strcmp(data, string(obj.ID)))
+                    if isempty(strcmp(carga, string(obj.ID)))
                         obj.mpr_ant(obj.mpr_ant == src) = [];
                     end
                 end
@@ -130,14 +140,18 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
             elseif msgType == 3
                 if dst == obj.ID
                     disp (['O no ',num2str(noAnterior), ' Enviou a mensagem: '])
-                    disp(data)
+                    disp(carga)
+                    disp(['msglen: ',num2str(msg_len)])
+                    disp(['Time Arrival: ', num2str(timeArrival)])
+                    disp(['Time Init: ', num2str(timeInit)])
                     latency =  timeArrival - timeInit;
+                    disp(latency)
                     bitRate = msg_len/latency;
                     disp(['Lantencia: ', num2str(latency*1000), ' ms'])
                     disp(['Vazao: ', num2str(bitRate/1024), 'Kbytes/s'])
                 elseif (isempty(obj.mpr_ant == src) == 0) && (findnode(obj.g, string(src)) ~= 0) && (ttl > 0)
                     % obj.payload = constructPayload (obj,3,src,dst,0,data);
-                    msg = msg.construct(3,Number,noAnterior,src,dst,ttl,data);
+                    msg = msg.construct(3,Number,noAnterior,src,dst,ttl,carga);
                     % obj = setSendOptions(obj, 0, 25000,5);
                     % obj.seqNumber = obj.seqNumber+1;
                     netManager = broadcast(obj,netManager,msg,msg.getLen(),GlobalTime);
@@ -210,10 +224,12 @@ classdef powerRXApplication_dummieCoils < powerRXApplication
                     noAnterior = obj.ID;
                     % obj.payload = constructPayload(obj, 3, obj.ID, sendto, 2, data);
                 end
-                msg = msg.construct(msgType,obj.seqNumber, noAnterior, obj.ID, sendto, ttl, data);
+                GlobalTime
+                msg = msg.TimeSend(GlobalTime);
+                msg = msg.construct(msgType,obj.seqNumber, noAnterior, obj.ID, sendto, ttl, data)
+                disp(['Time init send : ', num2str(msg.TimeInit)])
                 %Enviando
                 % obj = setSendOptions(obj, 0, 25000,5);
-                msg = msg.TimeSend(GlobalTime);
                 netManager = broadcast(obj,netManager,msg,msg.getLen,GlobalTime);
             end
 

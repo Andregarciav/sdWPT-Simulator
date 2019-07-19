@@ -7,8 +7,8 @@ classdef quadro
         src;        % 32 bits - 4 bytes  /
         dst;        % 32 bits - 4 bytes /
         ttl;        % 16 bits - 2 bytes/
-        payload;    %tamanho variável
-        TimeInit;
+        payload;    % Tamanho variável
+        TimeInit;   % Não é usado no tamanho, somente usado para calculo da vazão.
     end
 
     methods
@@ -18,31 +18,30 @@ classdef quadro
         end
 
         function  obj = construct(obj, msgType, number, noAnterior, src, dst, ttl, payload)
-            prop = whos('payload');
-            
             obj.msgType = msgType;
             obj.number = number;
-            obj.msg_len = prop.bytes;
             obj.noAnterior = noAnterior;
             obj.src = src;
             obj.dst = dst;
             obj.ttl = ttl;
             obj.payload = [payload];
+            obj.msg_len = obj.getLen() - 20;
         end
 
         function len = getLen (obj)
             headerLen = 20;
-            p = obj.payload
-            prop = whos('p')
-            len = headerLen + prop.bytes;
+            len_payload = obj.lenPayload();
+            len = headerLen + len_payload;
         end
 
         function obj = modifyPayload(obj, newData)
             obj.payload = [newData];
+            obj.msg_len = lenPayload(newData);
         end
 
         function obj = addData(obj, newData)
             obj.payload = [obj.payload,newData];
+            obj.msg_len = obj.msg_len + lenPayload(newData);
         end
 
         function obj = decreaseTTL(obj)
@@ -50,7 +49,22 @@ classdef quadro
         end
         
         function obj = TimeSend (obj, Time)
+            disp(Time)
             obj.TimeInit = Time;
+        end
+
+        function payloadLen = lenPayload(obj)
+            p = obj.payload; % Não aceita parte do obj para o whos
+            if ~isempty(p)
+                prop = whos('p');
+                if strcmp(prop.class,'string')
+                    payloadLen = length(p)*4;
+                else
+                    payloadLen = prop.bytes/2;
+                end
+            else
+                payloadLen = 0;
+            end
         end
 
     end

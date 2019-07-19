@@ -11,7 +11,7 @@ function [pkt] = constructPayload (obj)%,msgType,src,dst,ttl,data)
                 pkt = [pkt string(v(r))];
             end
         else
-            pkt = [];
+            pkt = [''];
         end
     % elseif msgType == 1
     %     %Construindo o cabeçalho
