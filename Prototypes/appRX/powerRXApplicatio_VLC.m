@@ -7,7 +7,7 @@ classdef powerRXApplicatio_VLC < powerRXApplication
         seqNumber
     end
     methods
-        function obj = powerRXApplication_dummieCoils(id)
+        function obj = powerRXApplicatio_VLC(id)
             obj@powerRXApplication(id);%construindo a estrutura referente �superclasse
             %obj.g = addnode(obj.g,20);
             obj.seqNumber = dec2hex(randi(1000))

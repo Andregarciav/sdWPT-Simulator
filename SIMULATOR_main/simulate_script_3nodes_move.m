@@ -1,12 +1,12 @@
 %This script is a simple demonstration of the network aspects of the simulator
 
-clear all;
+% clear all;
 
 noWarnings();%comente se quiser warnings
 
 %MANTENHA ISSO ATUALIZADO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-NRX = 2; %n�mero de dispositivos transmissores
-TOTAL_TIME = 600;%segundos de simula��o (em tempo virtual)
+NRX = 3; %n�mero de dispositivos transmissores
+TOTAL_TIME = 60;%segundos de simula��o (em tempo virtual)
 
 %ASPECTOS GERAIS (DUMMIE)-------------------------------------------------------
 W = 1e6;
@@ -42,7 +42,6 @@ efficiency = 0.95; % (95% de efici�ncia de convers�o AC/DC)
 STEP=0.2;     % (s)
 interval = 2; % intervalo entre chamadas de atividade
 
-
 dev = genericDeviceWithBattery(bat,power_m,power_sd,minV,minVTO,err,efficiency);
 DEVICE_LIST = [];
 for i=1:NRX
@@ -53,7 +52,7 @@ powerTX = powerTXApplication_dummieCoils();
 powerRX = [];
 
 for i=1:NRX
-    powerRX = [powerRX struct('obj',powerRXApplication_dummieCoils(i, interval))];
+    powerRX = [powerRX struct('obj',powerRXApplication_VLC_MPR(i, interval))];
 end
 
 %SIMULADOR (DUMMIE)----------------------------------------------------
@@ -71,7 +70,7 @@ A_RF = 2;%expoent for free-space path loss (RF only)
 N_SWIPT = 0.1;%Noise for SWIPT (W)
 N_RF = 0.1;%Noise for RF (W)
 
-[~,LOG_dev_list,LOG_app_list] = Simulate('vlc_facin.mat',1,R,C,W,TOTAL_TIME,MAX_ERR,R_MAX,...
+[~,LOG_dev_list,LOG_app_list] = Simulate('env_vlc_3move.mat',1,R,C,W,TOTAL_TIME,MAX_ERR,R_MAX,...
     IFACTOR,DFACTOR,INIT_VEL,MAX_ACT_POWER,MAX_APP_POWER,DEVICE_LIST,STEP,SHOW_PROGRESS,...
 	powerTX,powerRX,B_SWIPT,B_RF,A_RF,N_SWIPT,N_RF);
 
@@ -83,12 +82,12 @@ for i=2:length(LOG_app_list)
     disp(['For RX ',num2str(i-1),':']);
     disp('--------------------------------------');
     %disp(LOG_app_list(i).DATA);
-    figure(i-1)
-        p = plot(LOG_app_list(i).DATA.g);
-        highlight(p,string(i-1),'NodeColor', [0 0.75 0]);
-        %highlight(p,v,'NodeColor', 'red');
-        highlight(p,string(i-1),neighbors(LOG_app_list(i).DATA.g,string(i-1)),'EdgeColor', 'red');
-        highlight(p,string(LOG_app_list(i).DATA.lmpr),'NodeColor', 'red');
+    % figure(i-1)
+    %     p = plot(LOG_app_list(i).DATA.g);
+    %     highlight(p,string(i-1),'NodeColor', [0 0.75 0]);
+    %     %highlight(p,v,'NodeColor', 'red');
+    %     highlight(p,string(i-1),neighbors(LOG_app_list(i).DATA.g,string(i-1)),'EdgeColor', 'red');
+    %     highlight(p,string(LOG_app_list(i).DATA.lmpr),'NodeColor', 'red');
 
 
       

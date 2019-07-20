@@ -1,5 +1,5 @@
-%(THIS IS AN EXAMPLE FOR THE ONES WHO WANT TO USE THIS SIMULATOR AS A SIMPLE NETWORK SIMULATOR.)
-clear all;
+ %(THIS IS AN EXAMPLE FOR THE ONES WHO WANT TO USE THIS SIMULATOR AS A SIMPLE NETWORK SIMULATOR.)
+% clear all;
 
 savefile = true;%salvar depois da execução?
 plotAnimation = true;%mostrar a animação?
@@ -21,7 +21,6 @@ pts = 2; %resolução do caminho
 
 %-------------------------------------------------------------------------------------------------------------------
 
-
 %AQUI É ONDE VOCÊ VAI MEXER DE FATO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 %coordenadas da posição em metros
 group_list = [];
@@ -36,86 +35,65 @@ group.R = -1;group.C = -1;
 group_list = [group_list;group];
 
 %definindo nó 1
-x = 0.25;
-y = 0;
-z = 0;
-group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
-    wire_radius,pts,mi),x,y,z);
-%group.coils.obj = rotateCoilX(rotateCoilY(group.coils.obj,pi/2),pi/2); % rotacionar as instâncias vlc
+center = [0.25,0,0];
+normal = [1.5,0,0];
+group.coils.obj = VlcNode(center, normal);
 group.R = -1;group.C = -1;
 group_list = [group_list;group];
 
 %definindo nó 2
-x = 1.5;
-y = 0;
-z = 0;
-group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
-    wire_radius,pts,mi),x,y,z);
+center = [1.5,0,0];
+normal = [2.75,2.5,0];
+group.coils.obj = VlcNode(center, normal);
 group.R = -1;group.C = -1;
 group_list = [group_list;group];
 
 %definindo nó 3
-x = 2.75;
-y = 0;
-z = 0;
-group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
-    wire_radius,pts,mi),x,y,z);
+center = [2.75,0,0];
+normal = [1.5,2.5,0];
+group.coils.obj = VlcNode(center, normal);
 group.R = -1;group.C = -1;
 group_list = [group_list;group];
 
 %definindo nó 4
-x = 0.25;
-y = 1.25;
-z = 0;
-group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
-    wire_radius,pts,mi),x,y,z);
-%group.coils.obj = rotateCoilX(rotateCoilY(group.coils.obj,pi/2),pi/2); % rotacionar as instâncias vlc
+center = [0.25,1.25,0];
+normal = [1.5,2.5,0];
+group.coils.obj = VlcNode(center, normal);
 group.R = -1;group.C = -1;
 group_list = [group_list;group];
 
 %definindo nó 5
-x = 1.5;
-y = 1.25;
-z = 0;
-group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
-    wire_radius,pts,mi),x,y,z);
+center = [1.5,1.25,0];
+normal = [1.5,2.5,0];
+group.coils.obj = VlcNode(center, normal);
 group.R = -1;group.C = -1;
 group_list = [group_list;group];
 
 %definindo nó 6
-x = 2.75;
-y = 1.25;
-z = 0;
-group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
-    wire_radius,pts,mi),x,y,z);
+center = [2.75,1.25,0];
+normal = [1.5,2.5,0];
+group.coils.obj = VlcNode(center, normal);
 group.R = -1;group.C = -1;
 group_list = [group_list;group];
 
 %definindo nó 7
-x = 0.25;
-y = 2.5;
-z = 0;
-group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
-    wire_radius,pts,mi),x,y,z);
-%group.coils.obj = rotateCoilX(rotateCoilY(group.coils.obj,pi/2),pi/2); % rotacionar as instâncias vlc
+center = [0.25,2.5,0];
+normal = [1.5,1.25,0];
+group.coils.obj = VlcNode(center, normal);
 group.R = -1;group.C = -1;
 group_list = [group_list;group];
 
 %definindo nó 8
-x = 1.5;
-y = 2.5;
-z = 0;
-group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
-    wire_radius,pts,mi),x,y,z);
+center = [1.5,2.5,0];
+normal = [1.5,1.25,0];
+group.coils.obj = VlcNode(center, normal);
 group.R = -1;group.C = -1;
 group_list = [group_list;group];
 
 %definindo nó 9
-x = 2.75;
-y = 2.5;
-z = 0;
-group.coils.obj = translateCoil(SolenoidCoil(R,N,pitch,...
-    wire_radius,pts,mi),x,y,z);
+center = [2.75,2.5,0];
+normal = [1.5,1.25,0];
+group.coils.obj = VlcNode(center, normal);
 group.R = -1;group.C = -1;
 group_list = [group_list;group];
 %FIM DA SUA ÁREA DE ATUAÇÃO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -137,7 +115,12 @@ if(ok)
     end
 
     if plotAnimation
-        animation(envList,0.05,0.2);
+        %animation(envList,0.05,0.2);
+        figure()
+            hold on
+            for i=2:length(group_list)
+                plotCoil(group_list(i).coils.obj)
+            end
     end
 else
     error('Something is wrong with the environments.')
