@@ -1,7 +1,9 @@
-%apagando tudo
-clc;
+%   Script que gera o gráfico de probabilidade a partir
+%   do ganho no canal, lembrando que o ganho é menor que 1
+
 clear all;
-%%%%%%%%%%%
+clc;
+
 format long
 Half = 60*pi/180;
 m = log(0.5)/log(cos(Half));

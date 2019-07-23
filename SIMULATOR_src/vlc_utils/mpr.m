@@ -1,33 +1,33 @@
+%   Essa função recebe uma topologia e retorna
+%   A lista de nós MPR a partir do nó origem
+
 function [lMPR] = mpr (g,ID)
     lMPR = [];
-    %   Lista de vizinhos do ID
     v = neighbors(g, string(ID));
-    %   Obtendo um vetor de numeros ao invez de um vetor de strings
     if length(v) == 0
-        lMPR = []; % Se não tem vizinhos, não tem MPR
+        lMPR = [];
     elseif length(v) == 1
-        if length(neighbors(g,v(1))) > 1 %  Se os vizinhos dos vizinho é maior que 1, ele é mpr
+        if length(neighbors(g,v(1))) > 1
             lMPR = [str2num(v(1))];
-        else    %   Se o vizinho não tem vizinhos, lista MPR é vazia
+        else
             lMPR = [];
         end
-    elseif length(v) > 1 %lista de vizinhos é maior do que 1
-        grafo = g; %gerando um grafo para ser manipulado
+    elseif length(v) > 1
+        grafo = g;
         listaDoisSaltos = [];
-        while ~(isempty(neighbors(grafo, string(ID)))) %
+        while ~(isempty(neighbors(grafo, string(ID))))
             vizinhosTemp  = neighbors(grafo, string(ID));
             listaVizinhos = [];
             for h=1:length(vizinhosTemp)
                 listaVizinhos = [listaVizinhos [str2num(vizinhosTemp(h));degree(grafo,vizinhosTemp(h))]];
             end
-            listaVizinhos; %DEBUG
             ListaArestas = listaVizinhos(2,:);
             indexVizinhos = find(ListaArestas == max (ListaArestas),1,'last');
             if ~isempty(indexVizinhos)
                 vizinhoAtual = listaVizinhos(1,indexVizinhos);
                 V_Vn = neighbors(grafo,string(vizinhoAtual));
                 if (length(V_Vn) ~= 1)
-                    for r=1:length(V_Vn) %remove todos os vizinhos do Vizinho atual, exceto o ID
+                    for r=1:length(V_Vn)
                         if (ID ~= str2num(V_Vn(r)))
                             if isempty(listaDoisSaltos(listaDoisSaltos == str2num(V_Vn(r))))
                                 listaDoisSaltos = [listaDoisSaltos str2num(V_Vn(r))];
@@ -44,7 +44,7 @@ function [lMPR] = mpr (g,ID)
             else
                 lMPR = [];
             end
-            grafo = rmnode(grafo,string(vizinhoAtual)); %   Remove o vizinho atual do grafo temporário 
+            grafo = rmnode(grafo,string(vizinhoAtual));
         end
     end
 end
