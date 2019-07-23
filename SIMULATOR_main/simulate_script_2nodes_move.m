@@ -6,7 +6,7 @@ noWarnings();%comente se quiser warnings
 
 %MANTENHA ISSO ATUALIZADO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 NRX = 2; %n�mero de dispositivos transmissores
-TOTAL_TIME = 60;%segundos de simula��o (em tempo virtual)
+TOTAL_TIME = 600;%segundos de simula��o (em tempo virtual)
 
 %ASPECTOS GERAIS (DUMMIE)-------------------------------------------------------
 W = 1e6;
@@ -52,7 +52,7 @@ powerTX = powerTXApplication_dummieCoils();
 powerRX = [];
 
 for i=1:NRX
-    powerRX = [powerRX struct('obj',powerRXApplication_VLC_MPR(i, interval))];
+    powerRX = [powerRX struct('obj',powerRXApplication_VLC_MPR(i, interval, NRX))];
 end
 
 %SIMULADOR (DUMMIE)----------------------------------------------------
@@ -76,11 +76,18 @@ N_RF = 0.1;%Noise for RF (W)
 
 %LOG
 
+lat = [];
+bit = [];
+
 for i=2:length(LOG_app_list)
     %v = neighbors(LOG_app_list(i).DATA.g,string(i-1));
     disp(' ');
     disp(['For RX ',num2str(i-1),':']);
     disp('--------------------------------------');
+    if (~isempty(LOG_app_list(i).DATA.latencia))
+        lat = [lat mean(LOG_app_list(i).DATA.latencia)];
+        bit = [bit mean(LOG_app_list(i).DATA.bitRate)];
+    end
     %disp(LOG_app_list(i).DATA);
     % figure(i-1)
     %     p = plot(LOG_app_list(i).DATA.g);

@@ -17,7 +17,7 @@ classdef quadro
             
         end
 
-        function  obj = construct(obj, msgType, number, noAnterior, src, dst, ttl, payload)
+        function  obj = construct(obj, msgType, number, noAnterior, src, dst, ttl, payload, Time)
             obj.msgType = msgType;
             obj.number = number;
             obj.noAnterior = noAnterior;
@@ -26,6 +26,7 @@ classdef quadro
             obj.ttl = ttl;
             obj.payload = [payload];
             obj.msg_len = obj.getLen() - 20;
+            obj.TimeInit = Time;
         end
 
         function len = getLen (obj)
@@ -49,7 +50,6 @@ classdef quadro
         end
         
         function obj = TimeSend (obj, Time)
-            disp(Time)
             obj.TimeInit = Time;
         end
 

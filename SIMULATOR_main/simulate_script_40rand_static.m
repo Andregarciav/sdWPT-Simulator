@@ -5,7 +5,7 @@
 noWarnings();%comente se quiser warnings
 
 %MANTENHA ISSO ATUALIZADO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-NRX = 9; %n�mero de dispositivos transmissores
+NRX = 40; %n�mero de dispositivos transmissores
 TOTAL_TIME = 600;%segundos de simula��o (em tempo virtual)
 
 %ASPECTOS GERAIS (DUMMIE)-------------------------------------------------------
@@ -70,7 +70,7 @@ A_RF = 2;%expoent for free-space path loss (RF only)
 N_SWIPT = 0.1;%Noise for SWIPT (W)
 N_RF = 0.1;%Noise for RF (W)
 
-[~,LOG_dev_list,LOG_app_list] = Simulate('env_vlc_9nodes-3x3.mat',1,R,C,W,TOTAL_TIME,MAX_ERR,R_MAX,...
+[~,LOG_dev_list,LOG_app_list] = Simulate('env_vlc_40nodes_rand.mat',1,R,C,W,TOTAL_TIME,MAX_ERR,R_MAX,...
     IFACTOR,DFACTOR,INIT_VEL,MAX_ACT_POWER,MAX_APP_POWER,DEVICE_LIST,STEP,SHOW_PROGRESS,...
 	powerTX,powerRX,B_SWIPT,B_RF,A_RF,N_SWIPT,N_RF);
 
