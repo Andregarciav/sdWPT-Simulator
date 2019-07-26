@@ -14,10 +14,12 @@ function obj = topology(obj, carga, msg_len, src)
     
     if (~isempty(carga)) && strcmp(class(carga),'string') 
         i = msg_len/4;
+    elseif isempty(carga)
+        i = 0;
     else
         i = msg_len;
     end
-    
+
     if i > 1
         for r = 1:i
             temp = str2num(carga(r));

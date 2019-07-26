@@ -25,7 +25,7 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
             obj.interval = interval;
             obj.numberNodes = numberNodes;
             obj.pktReceive = {obj.ID};
-            obj.log_msgtype = [0 0 0 0];
+            obj.log_msgtype = [0 0 0 0 0];
             
         end
 
@@ -58,11 +58,13 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
             %%%%%%%%%%%%%%%%%%%% Tratando a mensagem
 
             obj.log_msgtype(msgType+1) = obj.log_msgtype(msgType+1)+1; 
+            
             if isempty(obj.lmsgReceive(obj.lmsgReceive == noAnterior))
                 obj.lmsgReceive = [obj.lmsgReceive [noAnterior;1]];
             else
                 obj.lmsgReceive(2,find(obj.lmsgReceive(1,:) == noAnterior)) = obj.lmsgReceive(2,find(obj.lmsgReceive(1,:) == noAnterior))+1; 
             end
+
             % Mensagem do tipo 0, é uma mensagem de construção da topologia da rede
             if msgType == 0
                 obj = topology(obj, carga, msg_len, src);
@@ -73,15 +75,18 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
                 if (isempty(obj.mpr_ant == src) == 0) && (ttl > 1)
                     if (findnode(obj.g, string(dst)) == 0) %se não conheço reencaminha a msg
                         carga = [carga string(obj.ID)]; % Não faz parte do protocolo, só pra saber o caminho
-                        msg.construct(msgType, Number, obj.ID, src, dst, ttl, carga, TimeInit);
+                        msg = msg.construct(msgType, Number, obj.ID, src, dst, ttl, carga, TimeInit);
                     elseif (findnode(obj.g, string(dst)) ~= 0 && dst ~= obj.ID) %%se conheço transformo a msg tipo 1 em tipo 3 e encaminho
-                        msg.construct(3, Number, obj.ID, src, dst, ttl, carga, timeInit);
+                        msg = msg.construct(3, Number, obj.ID, src, dst, ttl, carga, timeInit);
                     elseif dst == obj.ID
-                        latency =  timeArrival - timeInit;
-                        bitRate = msg_len/latency;
-                        obj.latencia = [obj.latencia latency*1000];
-                        obj.bitRate = [obj.bitRate bitRate/1024];
-                        obj.timeArrival = [obj.timeArrival timeArrival];
+                        % latency =  timeArrival - timeInit;
+                        % bitRate = msg_len/latency;
+                        % obj.latencia = [obj.latencia latency*1000];
+                        % obj.bitRate = [obj.bitRate bitRate/1024];
+                        % obj.timeArrival = [obj.timeArrival timeArrival];
+                        %aqui construir ACK
+                        carga = constructPayload(obj);
+                        msg = msg.construct(4,Number, obj.ID, obj.ID, dst, 16, carga);
                     end
                         netManager = broadcast(obj,netManager,msg,msg.getLen(),GlobalTime);
                 end
@@ -90,29 +95,35 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
                 end
             %mensagem do tipo 2 é mensagem informando aos vizinhos quais são seu mpr
             elseif msgType == 2
-                %   Caso o nó esteja na lista MPR recebida é armazenado na estrutura de controle
-                if ~(isempty(strcmp(carga, string(obj.ID))))
-                    if isempty(obj.mpr_ant == src)
-                        obj.mpr_ant = [obj.mpr_ant src];
-                    end
-                end
-                if ~isempty(obj.mpr_ant == src)
-                    if isempty(strcmp(carga, string(obj.ID)))
-                        obj.mpr_ant(obj.mpr_ant == src) = [];
-                    end
-                end
+                obj = msgType2();
             %msg do tipo 3 é a mensagem quando está a no máximo dois saltos do destinatário
             elseif msgType == 3
+                % disp('MSG TYPE: 3')
+                novamsg = quadro;
                 if dst == obj.ID
+                    carga = constructPayload(obj);
+                    novamsg = novamsg.construct(4,Number, obj.ID, obj.ID, src, 16, carga, timeInit);
+                    netManager = broadcast(obj,netManager,novamsg,novamsg.getLen(),GlobalTime);
+                    % disp('ACK send!!!')
+                elseif (isempty(obj.mpr_ant == src) == 0) && (findnode(obj.g, string(src)) ~= 0) && (ttl > 0)
+                    msg = msg.construct(3,Number,noAnterior,src,dst,ttl,carga, timeInit);
+                    netManager = broadcast(obj,netManager,msg,msg.getLen(),GlobalTime);
+                end
+                
+            elseif msgType == 4
+                % disp('MSG TYPE: 4')
+                if dst == obj.ID
+                    obj.wantAck = false;
                     latency =  timeArrival - timeInit;
                     bitRate = msg_len/latency;
                     obj.latencia = [obj.latencia latency*1000];
                     obj.bitRate = [obj.bitRate bitRate/1024];
                     obj.timeArrival = [obj.timeArrival timeArrival];
-                elseif (isempty(obj.mpr_ant == src) == 0) && (findnode(obj.g, string(src)) ~= 0) && (ttl > 0)
-                    msg = msg.construct(3,Number,noAnterior,src,dst,ttl,carga, timeInit);
-                    netManager = broadcast(obj,netManager,msg,msg.getLen(),GlobalTime);
+                    carga = constructPayload(obj);
+                    msg = msg.construct(4,Number, obj.ID, obj.ID, dst, 16, carga, timeInit);
                 end
+                obj = topology(obj, carga, msg_len, src);
+    
             end
             obj.APPLICATION_LOG.DATA = obj;        
         end
@@ -126,28 +137,25 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
             obj.seqNumber = obj.seqNumber+1;
             msg = quadro;
             pkt = constructPayload(obj);
-            msg = msg.construct(0,obj.seqNumber,0,obj.ID,0,16,pkt, GlobalTime);
+            msg = msg.construct(0,obj.seqNumber, obj.ID, obj.ID, 0, 16, pkt, GlobalTime);
             netManager = broadcast(obj,netManager,msg,msg.getLen(),GlobalTime);
             %   Obtem a lista de MPR
             obj.lmpr = mpr(obj.g,obj.ID);
+
             %   Envia a lista MPR, caso ela não esteja vazia
-            
             if ~(isempty(obj.lmpr))
                 msgType = 2;
                 obj.seqNumber = obj.seqNumber+1;
-                msg = msg.construct(msgType,obj.seqNumber, 0, obj.ID, 0, 16, [], GlobalTime);
+                msg = msg.construct(msgType,obj.seqNumber, obj.ID, obj.ID, 0, 16, [], GlobalTime);
                 msg = msg.TimeSend(GlobalTime);
                 netManager = broadcast(obj,netManager,msg,msg.getLen,GlobalTime);
             end
             
             %%%%%% FUNÇÃO DE TESTE  %%%%%%%%%
-            if obj.wantAck == false
-            %TODO: pensar sobre
-            end
             if (obj.ID == 1)...
                 && ( ((GlobalTime > 8) && (GlobalTime < 50)) || ((GlobalTime > 200) && (GlobalTime < 350)) )...
                 && obj.wantAck == false 
-                data = ['Oi eu sou o ',obj.ID,'.'];
+                data = ['Oi eu sou o ',num2str(obj.ID),'.'];
                 sendto =  randi([1, obj.numberNodes]);
                 obj.seqNumber = obj.seqNumber+1;
                 while sendto == obj.ID
@@ -163,7 +171,7 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
                     ttl = 2;
                     noAnterior = obj.ID;
                 end
-                msg = msg.construct(msgType,obj.seqNumber, noAnterior, obj.ID, sendto, ttl, data, GlobalTime);
+                msg = msg.construct(msgType,obj.seqNumber, obj.ID, obj.ID, sendto, ttl, data, GlobalTime);
                 temp = msg;
                 netManager = broadcast(obj,netManager,msg,msg.getLen,GlobalTime);
             elseif obj.wantAck == true
@@ -175,6 +183,19 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
             netManager = setTimer(obj,netManager,GlobalTime,obj.interval); %realimenta a simulação com novo evento de tempo
             
             obj.APPLICATION_LOG.DATA = obj;   
+        end
+
+        function obj = msgType2(obj)
+            if ~(isempty(strcmp(carga, string(obj.ID))))
+                if isempty(obj.mpr_ant == src)
+                    obj.mpr_ant = [obj.mpr_ant src];
+                end
+            end
+            if ~isempty(obj.mpr_ant == src)
+                if isempty(strcmp(carga, string(obj.ID)))
+                    obj.mpr_ant(obj.mpr_ant == src) = [];
+                end
+            end
         end
 
     end
