@@ -95,7 +95,7 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
                 end
             %mensagem do tipo 2 é mensagem informando aos vizinhos quais são seu mpr
             elseif msgType == 2
-                obj = msgType2();
+                obj = obj.msgType2(carga, src);
             %msg do tipo 3 é a mensagem quando está a no máximo dois saltos do destinatário
             elseif msgType == 3
                 % disp('MSG TYPE: 3')
@@ -122,7 +122,7 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
                     carga = constructPayload(obj);
                     msg = msg.construct(4,Number, obj.ID, obj.ID, dst, 16, carga, timeInit);
                 end
-                obj = topology(obj, carga, msg_len, src);
+                % obj = topology(obj, carga, msg_len, src);
     
             end
             obj.APPLICATION_LOG.DATA = obj;        
@@ -185,7 +185,7 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
             obj.APPLICATION_LOG.DATA = obj;   
         end
 
-        function obj = msgType2(obj)
+        function obj = msgType2(obj, carga, src)
             if ~(isempty(strcmp(carga, string(obj.ID))))
                 if isempty(obj.mpr_ant == src)
                     obj.mpr_ant = [obj.mpr_ant src];
