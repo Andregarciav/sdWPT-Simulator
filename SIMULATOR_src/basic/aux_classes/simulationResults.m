@@ -1,19 +1,19 @@
-%Objeto retornado pela função Simulate e que recolhe informações de cada
+%Objeto retornado pela funï¿½ï¿½o Simulate e que recolhe informaï¿½ï¿½es de cada
 %dispositivo
 
 classdef simulationResults
     
     properties(SetAccess = private, GetAccess = public)
         running
-        device_index %índice do dispositivo ao qual pertencem os dados
+        device_index %ï¿½ndice do dispositivo ao qual pertencem os dados
         BC %corrente bruta (que passa pela bobina)
         CC %corrente de recarga (dc, apenas RX)
         IE %corrente esperada pelo carregador (para uma recarga ideal, apenas RX)
         DC %corrente de descarga consumida pelo dispositivo (apenas RX)
-        %(Corrente de transmissão no caso do TX)
-        VB %tensão da bateria (apenas RX)
+        %(Corrente de transmissï¿½o no caso do TX)
+        VB %tensï¿½o da bateria (apenas RX)
         SOC %state of charge da bateria (apenas RX)
-        RL %resistência equivalente do dispositivo (RS no caso do TX)
+        RL %resistï¿½ncia equivalente do dispositivo (RS no caso do TX)
     end
 
     methods(Access=public)
@@ -21,7 +21,8 @@ classdef simulationResults
             if (length(device_index)~=1) || (device_index<0)
                 error('simulationResults: parameter error');
             end
-            obj.running = true;
+            %obj.running = true;
+            obj.running = false;
             obj.device_index = device_index;
 
             obj.BC = [];
@@ -43,12 +44,12 @@ classdef simulationResults
                         obj.BC = [obj.BC,aux];
                     else
                     	if(time<obj.BC(end,end))
-		                    %tratamento de excessão
+		                    %tratamento de excessï¿½o
 		                    i = find(obj, obj.BC, time);
-		                    %os casos em que l log está vazio e em que
-		                    %a inserção é no final já são tratados
-		                    %individualmente. No caso em que a inserção
-		                    %é no início o tratamento ocorre naturalmente
+		                    %os casos em que l log estï¿½ vazio e em que
+		                    %a inserï¿½ï¿½o ï¿½ no final jï¿½ sï¿½o tratados
+		                    %individualmente. No caso em que a inserï¿½ï¿½o
+		                    %ï¿½ no inï¿½cio o tratamento ocorre naturalmente
 		                    obj.BC = [obj.BC(:,1:i),aux,obj.BC(:,i+1:end)];
 		                else
 		                	%se time for repetido, apenas substitua
@@ -109,11 +110,11 @@ classdef simulationResults
                         %caso esperado
                         obj.RL = [obj.RL,aux];
                     else
-                        %tratamento de excessão
+                        %tratamento de excessï¿½o
                         i = find(obj, obj.RL, time);
-                        %os casos em que o log está vazio e em que a inserção é
-                        %no final já são tratados individualmente. No caso em que
-                        %a inserção é no início o tratamento ocorre naturalmente
+                        %os casos em que o log estï¿½ vazio e em que a inserï¿½ï¿½o ï¿½
+                        %no final jï¿½ sï¿½o tratados individualmente. No caso em que
+                        %a inserï¿½ï¿½o ï¿½ no inï¿½cio o tratamento ocorre naturalmente
                         obj.RL = [obj.RL(:,1:i),aux,obj.RL(:,i+1:end)];
                     end
                 end
@@ -197,8 +198,8 @@ classdef simulationResults
     end
     
     methods(Access=private)
-        %retorna o maior índice i de um elemento de um momento menor ou igual a time
-        %se não existir, o valor 0 é retornado
+        %retorna o maior ï¿½ndice i de um elemento de um momento menor ou igual a time
+        %se nï¿½o existir, o valor 0 ï¿½ retornado
         function i = find(obj, log, time)
             if(isempty(log))
                 %valor default
@@ -209,14 +210,14 @@ classdef simulationResults
                     i = 0;
                 else
                     if(time>=log(end,end))
-                        %o momento é posterior ao último que se tem registro
+                        %o momento ï¿½ posterior ao ï¿½ltimo que se tem registro
                         s = size(log);
                         i = s(2);
                     else
-                        %i0 e i1 delimitam o espaço de busca (e fazem parte dele inclusive)
+                        %i0 e i1 delimitam o espaï¿½o de busca (e fazem parte dele inclusive)
                         i0 = 1;
                         s = size(log);
-                        i1 = s(2)-1;%i=end já foi tratado
+                        i1 = s(2)-1;%i=end jï¿½ foi tratado
                         while(true)
                             i = floor((i1+i0)/2);
                             if(time>=log(end,i))
@@ -224,12 +225,12 @@ classdef simulationResults
                                     %encontrado o registro mais tardio que precede time
                                     break;
                                 else
-                                    %o sucessor ainda não supera o time. o espaço de busca agora começa nele
+                                    %o sucessor ainda nï¿½o supera o time. o espaï¿½o de busca agora comeï¿½a nele
                                     i0 = i+1;
                                 end
                             else
-                                %esse registro não pode ser um antecessor de time.
-                                %o espaço de busca deve terminar em seu antecessor.
+                                %esse registro nï¿½o pode ser um antecessor de time.
+                                %o espaï¿½o de busca deve terminar em seu antecessor.
                                 i1 = i-1;
                             end
                         end
@@ -249,7 +250,7 @@ classdef simulationResults
             else
                 i = find(obj, log, time);
                 if(i==0)
-                    %se o momento for anterior ao mais antigo já registrado
+                    %se o momento for anterior ao mais antigo jï¿½ registrado
                     if(time<log(end,1))
                         warningMsg('(SimulationResults) estimation may be inaccurate (past)');
                     end

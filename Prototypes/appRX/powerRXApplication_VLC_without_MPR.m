@@ -2,12 +2,12 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
     properties
         numberNodes;        %   Usado somente para saber quais nós existem para enviar msg
         interval;           %   Intervalo entre as rodadas
-        mpr_ant = [];       %   Lista de nós que sou MPR
+%        mpr_ant = [];       %   Lista de nós que sou MPR
         oneHope = [];       %   Nós a um salto, usado como controle para retirar um nó da lista de vizinhos
         g = graph;          %   grafo do nó, vizinhos e vizinhos de vizinhos
         seqNumber = 0;      %   Usado para numero de sequencia
         payload = [];       %   Carga útil a ser enviado, pode vir das camadas superiores ou para construir a topologia
-        lmpr = [];          %   lista de nós MPR para o nó
+%        lmpr = [];          %   lista de nós MPR para o nó
         lmsgReceive = [];   %   lista numero de msg recebidas de nós
         Position;
         pktReceive = [];
@@ -125,32 +125,33 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
                 % obj = topology(obj, carga, msg_len, src);
     
             end
-            obj = LOG(obj);         
+            obj.APPLICATION_LOG.DATA = obj;        
         end
 
         function [obj,netManager,WPTManager] = handleTimer(obj,GlobalTime,netManager,WPTManager)
-            %reconfigurarando a lista de vizinhos
-            if isempty(obj.oneHope)==0
-                obj = remakeGraph(obj);
-            end
+            % %reconfigurarando a lista de vizinhos
+            % if isempty(obj.oneHope)==0
+            %     obj = remakeGraph(obj);
+            % end
 
-            obj.seqNumber = obj.seqNumber+1;
-            msg = quadro;
-            pkt = constructPayload(obj);
-            msg = msg.construct(0,obj.seqNumber, obj.ID, obj.ID, 0, 16, pkt, GlobalTime);
-            netManager = broadcast(obj,netManager,msg,msg.getLen(),GlobalTime);
-            %   Obtem a lista de MPR
-            obj.lmpr = mpr(obj.g,obj.ID);
+            % obj.seqNumber = obj.seqNumber+1;
+            % msg = quadro;
+            % pkt = constructPayload(obj);
+            % msg = msg.construct(0,obj.seqNumber, obj.ID, obj.ID, 0, 16, pkt, GlobalTime);
+            % netManager = broadcast(obj,netManager,msg,msg.getLen(),GlobalTime);
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % %   Obtem a lista de MPR
+            % obj.lmpr = mpr(obj.g,obj.ID);
 
-            %   Envia a lista MPR, caso ela não esteja vazia
-            if ~(isempty(obj.lmpr))
-                msgType = 2;
-                obj.seqNumber = obj.seqNumber+1;
-                msg = msg.construct(msgType,obj.seqNumber, obj.ID, obj.ID, 0, 16, [], GlobalTime);
-                msg = msg.TimeSend(GlobalTime);
-                netManager = broadcast(obj,netManager,msg,msg.getLen,GlobalTime);
-            end
-            
+            % %   Envia a lista MPR, caso ela não esteja vazia
+            % if ~(isempty(obj.lmpr))
+            %     msgType = 2;
+            %     obj.seqNumber = obj.seqNumber+1;
+            %     msg = msg.construct(msgType,obj.seqNumber, obj.ID, obj.ID, 0, 16, [], GlobalTime);
+            %     msg = msg.TimeSend(GlobalTime);
+            %     netManager = broadcast(obj,netManager,msg,msg.getLen,GlobalTime);
+            % end
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%% FUNÇÃO DE TESTE  %%%%%%%%%
             if (obj.ID == 1)...
                 && ( ((GlobalTime > 8) && (GlobalTime < 50)) || ((GlobalTime > 200) && (GlobalTime < 350)) )...
@@ -179,9 +180,10 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
                 obj.wantAck = false
             end
 
+
             netManager = setTimer(obj,netManager,GlobalTime,obj.interval); %realimenta a simulação com novo evento de tempo
             
-            obj = LOG(obj); 
+            obj.APPLICATION_LOG.DATA = obj;   
         end
 
         function obj = msgType2(obj, carga, src)
@@ -195,22 +197,6 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
                     obj.mpr_ant(obj.mpr_ant == src) = [];
                 end
             end
-        end
-
-        function obj = LOG(obj)
-            d.mpr_ant = obj.mpr_ant;
-            d.oneHope = obj.oneHope;
-            d.g = obj.g;
-            d.seqNumber = obj.seqNumber;
-            d.payload = obj.payload;
-            d.lmpr = obj.lmpr;
-            d.lmsgReceive = obj.lmsgReceive;
-            d.Position = obj.Position;
-            d.pktReceive = obj.pktReceive;
-            d.log_msgtype = obj.log_msgtype;
-            d.latencia = obj.latencia;
-            d.bitRate = obj.bitRate;
-            obj.APPLICATION_LOG.DATA = d; 
         end
 
     end

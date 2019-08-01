@@ -77,4 +77,4 @@ end
 lat5 = lat;
 bit5 = bit;
 
-save('simulate_scenery1.mat');
+save('simulate_scenery2.mat');

@@ -25,7 +25,7 @@ bit6 = [];
 
 %simulando instância 1
 for i=1:25
-    simulate_script_2nodes_10;
+    simulate_script_2nodes_static;
 end
 
 lat1 = lat;
@@ -36,7 +36,7 @@ lat = [];
 bit = [];
 
 for i=1:25
-    simulate_script_2nodes_50;
+    simulate_script_2nodes_move;
 end
 
 lat2 = lat;
@@ -48,7 +48,7 @@ lat = [];
 bit = [];
 
 for i=1:25
-    simulate_script_2nodes_100;
+    simulate_script_3nodes_static;
 end
 
 lat3 = lat;
@@ -59,7 +59,7 @@ lat = [];
 bit = [];
 
 for i=1:25
-    simulate_script_2nodes_200;
+    simulate_script_3nodes_move;
 end
 
 lat4 = lat;
@@ -71,10 +71,21 @@ lat = [];
 bit = [];
 
 for i=1:25
-    simulate_script_2nodes_300;
+    simulate_script_3x3;
 end
 
 lat5 = lat;
 bit5 = bit;
 
-save('simulate_scenery1.mat');
+% %Simulando instancia 6
+
+lat = [];
+bit = [];
+for i=1:25
+    simulate_script_3x3_test2;
+end
+
+lat6 = lat;
+bit6 = bit;
+
+save('simulate3.mat');

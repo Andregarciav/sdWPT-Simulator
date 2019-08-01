@@ -5,7 +5,7 @@
 noWarnings();%comente se quiser warnings
 
 %MANTENHA ISSO ATUALIZADO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-NRX = 30; %n�mero de dispositivos transmissores
+NRX = 2; %n�mero de dispositivos transmissores
 TOTAL_TIME = 600;%segundos de simula��o (em tempo virtual)
 
 %ASPECTOS GERAIS (DUMMIE)-------------------------------------------------------
@@ -70,24 +70,26 @@ A_RF = 2;%expoent for free-space path loss (RF only)
 N_SWIPT = 0.1;%Noise for SWIPT (W)
 N_RF = 0.1;%Noise for RF (W)
 
-[~,LOG_dev_list,LOG_app_list] = Simulate('env_vlc_40nodes_rand.mat',1,R,C,W,TOTAL_TIME,MAX_ERR,R_MAX,...
+[~,LOG_dev_list,LOG_app_list] = Simulate('env_vlc_2_100.mat',1,R,C,W,TOTAL_TIME,MAX_ERR,R_MAX,...
     IFACTOR,DFACTOR,INIT_VEL,MAX_ACT_POWER,MAX_APP_POWER,DEVICE_LIST,STEP,SHOW_PROGRESS,...
 	powerTX,powerRX,B_SWIPT,B_RF,A_RF,N_SWIPT,N_RF);
 
 %LOG
-lat = [];
-bit = [];
+
+% lat = [];
+% bit = [];
+% desviolat = [];
+% desviobit = [];
 
 for i=2:length(LOG_app_list)
     %v = neighbors(LOG_app_list(i).DATA.g,string(i-1));
     disp(' ');
     disp(['For RX ',num2str(i-1),':']);
     disp('--------------------------------------');
-    if (~isempty(LOG_app_list(i).DATA.d.latencia))
-        lat = [lat mean(LOG_app_list(i).DATA.latencia)];
-        bit = [bit mean(LOG_app_list(i).DATA.bitRate)];
+    if (~isempty(LOG_app_list(i).DATA.latencia))
+        bit = [bit (LOG_app_list(i).DATA.bitRate)];
+        lat = [lat (LOG_app_list(i).DATA.latencia)];
     end
-
     %disp(LOG_app_list(i).DATA);
     % figure(i-1)
     %     p = plot(LOG_app_list(i).DATA.g);
@@ -95,7 +97,4 @@ for i=2:length(LOG_app_list)
     %     %highlight(p,v,'NodeColor', 'red');
     %     highlight(p,string(i-1),neighbors(LOG_app_list(i).DATA.g,string(i-1)),'EdgeColor', 'red');
     %     highlight(p,string(LOG_app_list(i).DATA.lmpr),'NodeColor', 'red');
-
-
-      
 end
