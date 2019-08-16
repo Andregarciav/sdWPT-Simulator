@@ -10,15 +10,12 @@ desvioBit       =   [];
 lat = [];
 bit = [];
 
-lat1 = [];
-bit1 = [];
+
 
 %simulando instância 1
-for i=1:25
-    simulate_script_40rand_static;
-    clear LOG_app_list;
+for inst=1:25
+    simulate_script_3x3;
+    save(['simulate_3x3_1,5_4_',num2str(inst),'.mat']);
 end
 
-lat1 = lat;
-bit1 = bit;
-save('simulate_40_1.mat', LOG_app_list);
+save('simulate_9_scenery4.mat');

@@ -53,7 +53,7 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
             dst = data.dst;                 %   Qual é o destino da msg
             ttl = data.ttl;                 %   Time to live da msg
             %%%%%%%%%%%%%%%%%%%%%% Atualizando parâmetros
-            carga = data.payload;            %   Retirando cabeçalho
+            carga = data.payload;           %   Retirando cabeçalho
             ttl = ttl - 1;                  %   Decrementando o TTL
             %%%%%%%%%%%%%%%%%%%% Tratando a mensagem
 

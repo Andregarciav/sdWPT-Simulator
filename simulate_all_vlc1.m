@@ -26,6 +26,7 @@ bit6 = [];
 %simulando instância 1
 for i=1:25
     simulate_script_2nodes_10;
+    save(['simulate_2nodes10_1_',num2str(i),'.mat']);
 end
 
 lat1 = lat;
@@ -37,6 +38,7 @@ bit = [];
 
 for i=1:25
     simulate_script_2nodes_50;
+    save(['simulate_2nodes50_1_',num2str(i),'.mat']);
 end
 
 lat2 = lat;
@@ -49,6 +51,7 @@ bit = [];
 
 for i=1:25
     simulate_script_2nodes_100;
+    save(['simulate_2nodes100_1_',num2str(i),'.mat']);
 end
 
 lat3 = lat;
@@ -60,6 +63,7 @@ bit = [];
 
 for i=1:25
     simulate_script_2nodes_200;
+    save(['simulate_2nodes200_1_',num2str(i),'.mat']);
 end
 
 lat4 = lat;
@@ -72,6 +76,21 @@ bit = [];
 
 for i=1:25
     simulate_script_2nodes_300;
+    save(['simulate_2nodes300_1_',num2str(i),'.mat']);
+end
+
+lat5 = lat;
+bit5 = bit;
+
+
+% %Simulando instância 6
+
+lat = [];
+bit = [];
+
+for i=1:25
+    simulate_script_2nodes_400;
+    save(['simulate_2nodes400_1_',num2str(i),'.mat']);
 end
 
 lat5 = lat;

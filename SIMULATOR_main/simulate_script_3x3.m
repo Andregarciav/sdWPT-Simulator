@@ -75,8 +75,8 @@ N_RF = 0.1;%Noise for RF (W)
 	powerTX,powerRX,B_SWIPT,B_RF,A_RF,N_SWIPT,N_RF);
 
 %LOG
-lat = [];
-bit = [];
+% lat = [];
+% bit = [];
 
 for i=2:length(LOG_app_list)
     %v = neighbors(LOG_app_list(i).DATA.g,string(i-1));
@@ -84,8 +84,8 @@ for i=2:length(LOG_app_list)
     disp(['For RX ',num2str(i-1),':']);
     disp('--------------------------------------');
     if (~isempty(LOG_app_list(i).DATA.latencia))
-        lat = [lat mean(LOG_app_list(i).DATA.latencia)];
-        bit = [bit mean(LOG_app_list(i).DATA.bitRate)];
+        lat = [lat (LOG_app_list(i).DATA.latencia)];
+        bit = [bit (LOG_app_list(i).DATA.bitRate)];
     end
 
     %disp(LOG_app_list(i).DATA);
