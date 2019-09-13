@@ -17,19 +17,33 @@ atraso200 = [];
 atraso300 = [];
 atraso400 = [];
 
+
+vazao10  = [];
+vazao50  = [];
+vazao100 = [];
+vazao200 = [];
+vazao300 = [];
+vazao400 = [];
+
 for file=1:length(matfiles_10)
     load(matfiles_10(file).name);
     atraso10 = [atraso10 lat];
+    vazao10 = [vazao10 bit];
     load(matfiles_50(file).name);
     atraso50 = [atraso50 lat];
+    vazao50 = [vazao50 bit];
     load(matfiles_100(file).name);
     atraso100 = [atraso100 lat];
+    vazao100 = [vazao100 bit];
     load(matfiles_200(file).name);
     atraso200 = [atraso200 lat];
+    vazao200 = [vazao200 bit];
     load(matfiles_300(file).name);
     atraso300 = [atraso300 lat];
+    vazao300 = [vazao300 bit];
     load(matfiles_400(file).name);
     atraso400 = [atraso400 lat];
+    vazao400 = [vazao400 bit];
 end
 
 latencyMean = [mean(atraso10) mean(atraso50) mean(atraso100) mean(atraso200) mean(atraso300) mean(atraso400)];

@@ -17,6 +17,7 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
         timeArrival = [];
         wantAck = false;
         temp = quadro;
+        retransmit = 4;
     end
     methods
         function obj = powerRXApplication_VLC_MPR(id,interval, numberNodes)
@@ -174,9 +175,12 @@ classdef powerRXApplication_VLC_MPR < powerRXApplication
                 msg = msg.construct(msgType,obj.seqNumber, obj.ID, obj.ID, sendto, ttl, data, GlobalTime);
                 temp = msg;
                 netManager = broadcast(obj,netManager,msg,msg.getLen,GlobalTime);
-            elseif obj.wantAck == true
+            elseif obj.wantAck == true && obj.retransmit > 0
                 netManager = broadcast(obj,netManager,temp,temp.getLen,GlobalTime);
-                obj.wantAck = false
+                obj.retrasmit = obj.retransmit - 1;
+                if obj.retransmit == 0
+                    obj.wantAck = false;
+                end
             end
 
             netManager = setTimer(obj,netManager,GlobalTime,obj.interval); %realimenta a simulação com novo evento de tempo
