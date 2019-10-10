@@ -18,10 +18,8 @@ function SINR = SINR_RF(WPTManager,message,conflictList,t,nSamples)
     Lambda_recieve = calculateLambda(Cr,Vr,Cs);
     Lambda_transmissor = calculateLambda(Cs,Vs,Cr);
     %teste se emissor e receptor não estão de costas
-    if ((Lambda_recieve < 0  ||  Lambda_recieve > 1)...
-        && (Lambda_transmissor < 0  ||  Lambda_transmissor > 1))     % Caso os valores os lambdas fiquem entre 0 e 1,
-        % Distância entre os nós                                                                                      % significa que o raio luminoso de sinal cruzou
-        d = norm(Cs-Cr);                                                                                          % o plano do receptor.
+    if (Lambda_recieve && Lambda_transmissor)                                                                                      
+        d = norm(Cs-Cr);                                                                                          % 
         %Calculando parametros cossenos
         %cos_FI = (Cs(3) - Cr(3)) / d
         cos_FI =  dot(Vs,Vsr)/(norm(Vs) * norm(Vsr));
